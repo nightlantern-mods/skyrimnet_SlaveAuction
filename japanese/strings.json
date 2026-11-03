@@ -1,0 +1,25 @@
+{
+  "string": {
+    "drinkDizzy": "喉が焼けるような酒だ……視界がぐらりと揺れる。",
+    "wakeInCage": "目を覚ますと、裸のまま檻に閉じ込められていた。",
+    "lotPlayer": "自分自身(最後の出品)",
+    "lotNotYet": "まだ決めない",
+    "menuMissing": "UIExtensions が見つからないため、一覧を開けません。",
+    "freed": "自由の身になった。持ち物は扉のそばの宝箱にある。",
+    "exitLocked": "扉は外側から鍵がかけられている。",
+    "exitNoAnswer": "出口 MOD から応答がありませんでした。",
+    "noFollowers": "ここにフォロワーはいません。",
+    "lotAll": "全員",
+    "followersTaken": "フォロワーは檻に入れられました。競売場の扉は開いています。",
+    "bidHowTo": "入札キーで手を挙げられます。",
+    "bidStatus": "現在の価格",
+    "bidGold": "所持金",
+    "bidHolding": "今はあなたが最高額です。",
+    "bidTooMuch": "所持金が足りません。",
+    "bidLastCall": "他にいませんか！",
+    "guestClosed": "競売が終わりました。",
+    "soldOffScreen": "間に合いませんでした。フォロワーは売られました。",
+    "brawl": "競売は混乱の中で中止になりました。",
+    "bidRaised": "手を挙げました"
+  }
+}

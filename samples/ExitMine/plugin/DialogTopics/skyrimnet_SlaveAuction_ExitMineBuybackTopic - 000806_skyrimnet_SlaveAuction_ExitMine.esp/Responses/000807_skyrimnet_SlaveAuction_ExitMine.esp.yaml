@@ -1,0 +1,40 @@
+FormKey: 000807:skyrimnet_SlaveAuction_ExitMine.esp
+PreviousDialog: Null
+VirtualMachineAdapter:
+  Scripts:
+  - Name: skyrimnet_SlaveAuction_ExitMineTIF
+  ScriptFragments:
+    MutagenObjectType: ScriptFragments
+    FileName: skyrimnet_SlaveAuction_ExitMineTIF
+    OnEnd:
+      ExtraBindDataVersion: 1
+      ScriptName: skyrimnet_SlaveAuction_ExitMineTIF
+      FragmentName: Fragment_0
+Flags:
+  Flags:
+  - Goodbye
+FavorLevel: None
+Responses:
+- EmotionValue: 50
+  ResponseNumber: 1
+  Unknown2: 0x000000
+  Unknown3: 0x000000
+  Text:
+    TargetLanguage: English
+    Value: '...'
+  ScriptNotes: ''
+  Edits: ''
+Conditions:
+- MutagenObjectType: ConditionFloat
+  Unknown1: 0x000000
+  Data:
+    MutagenObjectType: GetIsAliasRefConditionData
+    ReferenceAliasIndex: 1
+  ComparisonValue: 1
+- MutagenObjectType: ConditionFloat
+  CompareOperator: GreaterThan
+  Unknown1: 0x000000
+  Data:
+    MutagenObjectType: GetGlobalValueConditionData
+    Global: 000802:skyrimnet_SlaveAuction_ExitMine.esp
+  ComparisonValue: 0

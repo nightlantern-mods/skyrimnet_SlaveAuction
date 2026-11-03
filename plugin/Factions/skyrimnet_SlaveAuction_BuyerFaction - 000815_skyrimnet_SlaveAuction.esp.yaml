@@ -1,0 +1,7 @@
+FormKey: 000815:skyrimnet_SlaveAuction.esp
+EditorID: skyrimnet_SlaveAuction_BuyerFaction
+Name:
+  TargetLanguage: English
+  Value: Slave Auction Buyer
+Flags:
+- HiddenFromPC

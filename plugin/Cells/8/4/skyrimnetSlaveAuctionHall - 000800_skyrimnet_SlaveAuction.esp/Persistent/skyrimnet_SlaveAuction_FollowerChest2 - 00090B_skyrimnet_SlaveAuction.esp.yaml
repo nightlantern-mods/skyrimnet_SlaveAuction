@@ -1,0 +1,11 @@
+# FollowerChest2
+MutagenObjectType: PlacedObject
+FormKey: 00090B:skyrimnet_SlaveAuction.esp
+MajorRecordFlagsRaw: 1024
+SkyrimMajorRecordFlags:
+- 0x400
+EditorID: skyrimnet_SlaveAuction_FollowerChest2
+Base: 0F8476:Skyrim.esm
+Placement:
+  Position: 3152, -60, 0
+  Rotation: 0, 0, 0.0

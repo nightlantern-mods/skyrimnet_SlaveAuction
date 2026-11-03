@@ -1,0 +1,11 @@
+# CageMarker
+MutagenObjectType: PlacedObject
+FormKey: 000900:skyrimnet_SlaveAuction.esp
+MajorRecordFlagsRaw: 1024
+SkyrimMajorRecordFlags:
+- 0x400
+EditorID: skyrimnet_SlaveAuction_CageMarker
+Base: 000034:Skyrim.esm
+Placement:
+  Position: 754.0, 1140.5, 0
+  Rotation: 0, 0, 3.1415927

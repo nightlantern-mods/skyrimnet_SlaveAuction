@@ -1,0 +1,9 @@
+FormKey: 000834:skyrimnet_SlaveAuction.esp
+EditorID: skyrimnet_SlaveAuction_OfferTopic
+Name:
+  TargetLanguage: English
+  Value: "(Keep away from the drink yourself, and have your followers drink it)"
+Priority: 50
+Quest: 000801:skyrimnet_SlaveAuction.esp
+SubtypeName: CUST
+Branch: 000833:skyrimnet_SlaveAuction.esp

@@ -1,0 +1,9 @@
+FormKey: 000821:skyrimnet_SlaveAuction.esp
+EditorID: skyrimnet_SlaveAuction_DrinkTopic
+Name:
+  TargetLanguage: English
+  Value: "(Drink the rare liquor she offers)"
+Priority: 50
+Quest: 000801:skyrimnet_SlaveAuction.esp
+SubtypeName: CUST
+Branch: 000820:skyrimnet_SlaveAuction.esp

@@ -1,0 +1,14 @@
+MutagenObjectType: PlacedObject
+FormKey: 00082C:skyrimnet_SlaveAuction.esp
+MajorRecordFlagsRaw: 1024
+EditorID: skyrimnet_SlaveAuction_WorldDoor
+SkyrimMajorRecordFlags:
+- 0x400
+Base: 10C62A:Skyrim.esm
+TeleportDestination:
+  Door: 000907:skyrimnet_SlaveAuction.esp
+  Position: -768, 1536, 256
+  Rotation: 0, 0, 3.1415927
+Placement:
+  Position: 171007.03, -85129.40, 10146.78
+  Rotation: 0, 0, 4.0470695

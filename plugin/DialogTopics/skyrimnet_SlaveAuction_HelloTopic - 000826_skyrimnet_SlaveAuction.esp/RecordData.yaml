@@ -1,0 +1,10 @@
+FormKey: 000826:skyrimnet_SlaveAuction.esp
+EditorID: skyrimnet_SlaveAuction_HelloTopic
+Name:
+  TargetLanguage: English
+  Value: skyrimnet_SlaveAuction_HelloTopic
+Priority: 50
+Quest: 000801:skyrimnet_SlaveAuction.esp
+Category: Misc
+Subtype: Hello
+SubtypeName: HELO

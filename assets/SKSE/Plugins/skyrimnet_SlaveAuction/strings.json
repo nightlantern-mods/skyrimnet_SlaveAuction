@@ -1,0 +1,25 @@
+{
+  "string": {
+    "drinkDizzy": "The drink burns your throat... the room starts to spin.",
+    "wakeInCage": "You wake up naked, locked in a cage.",
+    "lotPlayer": "Yourself (the last lot)",
+    "lotNotYet": "Not yet",
+    "menuMissing": "UIExtensions is missing: the list cannot open.",
+    "freed": "You are free. Your belongings are in the chest by the door.",
+    "exitLocked": "The door is locked from the outside.",
+    "exitNoAnswer": "The exit mod did not answer.",
+    "noFollowers": "No follower of yours is here.",
+    "lotAll": "All of them",
+    "followersTaken": "Your followers are in the cage below. The hall door is open to you.",
+    "bidHowTo": "Press the bid key to raise your hand.",
+    "bidStatus": "Current bid",
+    "bidGold": "your gold",
+    "bidHolding": "You hold the highest bid.",
+    "bidTooMuch": "You do not have that much gold.",
+    "bidLastCall": "Last call!",
+    "guestClosed": "The auction is over.",
+    "soldOffScreen": "You came too late: your followers have been sold.",
+    "brawl": "The auction breaks up in panic.",
+    "bidRaised": "You raise your hand"
+  }
+}

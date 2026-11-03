@@ -1,0 +1,48 @@
+FormKey: 000F07:skyrimnet_SlaveAuction.esp
+IsCompressed: True
+MajorRecordFlagsRaw: 262144
+VersionControl: 13665
+SkyrimMajorRecordFlags:
+- Compressed
+Data:
+  Parent:
+    MutagenObjectType: CellNavmeshParent
+    Parent: 000800:skyrimnet_SlaveAuction.esp
+  Vertices:
+  - 3367.874, -7.986206, 23.580042
+  - 3031.874, 328.0138, 31.580042
+  - 3007.874, -7.986206, 47.58004
+  - 3367.874, 328.0138, 55.58004
+  - 3399.874, 296.0138, 47.58004
+  - 2999.874, 296.0138, 39.58004
+  Triangles:
+  - Vertices: 0, 1, 2
+    EdgeLink_0_1: 1
+    EdgeLink_1_2: 3
+    EdgeLink_2_0: -1
+    Flags:
+    - Found
+  - Vertices: 0, 3, 1
+    EdgeLink_0_1: 2
+    EdgeLink_1_2: -1
+    Flags:
+    - Found
+  - Vertices: 0, 4, 3
+    EdgeLink_0_1: -1
+    EdgeLink_1_2: -1
+    EdgeLink_2_0: 1
+    Flags:
+    - Found
+  - Vertices: 1, 5, 2
+    EdgeLink_0_1: -1
+    EdgeLink_1_2: -1
+    Flags:
+    - Found
+  NavmeshGridDivisor: 1
+  MaxDistanceX: 400
+  MaxDistanceY: 336
+  Min: 2999.874, -7.986206, 23.580042
+  Max: 3399.874, 328.0138, 55.58004
+  NavmeshGrid: 0x040000000000010002000300
+MajorFlags:
+- 0x40000

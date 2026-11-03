@@ -1,0 +1,7 @@
+FormKey: 000817:skyrimnet_SlaveAuction.esp
+EditorID: skyrimnet_SlaveAuction_CaptiveFaction
+Name:
+  TargetLanguage: English
+  Value: Slave Auction Captive
+Flags:
+- HiddenFromPC

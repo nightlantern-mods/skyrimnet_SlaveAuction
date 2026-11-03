@@ -1,0 +1,25 @@
+{
+  "id": "local.skyrimnet-slaveauction-exitmine",
+  "type": "bundle",
+  "title": "SkyrimNet Slave Auction: The Mine",
+  "tagline": "Sample exit for the slave auction.",
+  "description": "Keeps the AI from firing the player's own choice in skyrimnet_SlaveAuction_ExitMine.esp.",
+  "author": "nightlantern-mods",
+  "tags": [
+    "prompts"
+  ],
+  "nsfw": true,
+  "icon": "sparkles",
+  "mods": [
+    {
+      "name": "SkyrimNet Slave Auction: The Mine",
+      "file": "skyrimnet_SlaveAuction_ExitMine.esp",
+      "required": true
+    }
+  ],
+  "languages": [
+    "en"
+  ],
+  "version": "0.1.0",
+  "min_skyrimnet_version": "0.25.0"
+}

@@ -1,0 +1,15 @@
+# OutsideDoor
+MutagenObjectType: PlacedObject
+FormKey: 000907:skyrimnet_SlaveAuction.esp
+MajorRecordFlagsRaw: 1024
+SkyrimMajorRecordFlags:
+- 0x400
+EditorID: skyrimnet_SlaveAuction_OutsideDoor
+Base: 04203A:Skyrim.esm
+TeleportDestination:
+  Door: 00082C:skyrimnet_SlaveAuction.esp
+  Position: 171203.71, -84975.07, 10098.78
+  Rotation: 0, 0, 0.9055
+Placement:
+  Position: -768, 1664.0, 256
+  Rotation: 0, 0, 0.0

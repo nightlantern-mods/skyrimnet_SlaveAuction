@@ -1,0 +1,39 @@
+FormKey: 000800:skyrimnet_SlaveAuction.esp
+EditorID: skyrimnetSlaveAuctionHall
+Name:
+  TargetLanguage: English
+  Value: "Underground Auction Hall"
+Flags:
+- IsInteriorCell
+Lighting:
+  AmbientColor: '#00000000'
+  DirectionalColor: '#00000000'
+  FogNearColor: '#00000000'
+  FogPower: 1
+  AmbientColors:
+    DirectionalXPlus: '#002C2418'
+    DirectionalXMinus: '#00232415'
+    DirectionalYPlus: '#00282517'
+    DirectionalYMinus: '#00282217'
+    DirectionalZPlus: '#0013110A'
+    DirectionalZMinus: '#003C3623'
+    Specular: '#00000000'
+    Scale: 1
+  FogFarColor: '#00000000'
+  FogMax: 1
+  Inherits:
+  - AmbientColor
+  - DirectionalColor
+  - FogColor
+  - FogNear
+  - FogFar
+  - DirectionalRotation
+  - DirectionalFade
+  - ClipDistance
+  - FogPower
+  - FogMax
+LightingTemplate: 06909B:Skyrim.esm  # ImperialFortCloseTemplate
+WaterHeight: -2.1474836E+09
+AcousticSpace: 04075D:Skyrim.esm  # IntDungeonFortAcousticSpace
+Music: 05615B:Skyrim.esm  # MUSDungeonFort
+ImageSpace: 0A2687:Skyrim.esm  # DefaultImageSpaceDungeon

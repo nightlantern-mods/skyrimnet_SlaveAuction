@@ -1,0 +1,11 @@
+# LiberatorMarker
+MutagenObjectType: PlacedObject
+FormKey: 00090E:skyrimnet_SlaveAuction.esp
+MajorRecordFlagsRaw: 1024
+SkyrimMajorRecordFlags:
+- 0x400
+EditorID: skyrimnet_SlaveAuction_LiberatorMarker
+Base: 000034:Skyrim.esm
+Placement:
+  Position: 153, 116, 0
+  Rotation: 0, 0, 5.4977871

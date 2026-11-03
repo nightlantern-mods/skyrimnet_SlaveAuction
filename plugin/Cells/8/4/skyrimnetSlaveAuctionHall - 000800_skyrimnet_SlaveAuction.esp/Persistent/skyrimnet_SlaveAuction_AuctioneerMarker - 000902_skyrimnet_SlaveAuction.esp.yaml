@@ -1,0 +1,11 @@
+# AuctioneerMarker
+MutagenObjectType: PlacedObject
+FormKey: 000902:skyrimnet_SlaveAuction.esp
+MajorRecordFlagsRaw: 1024
+SkyrimMajorRecordFlags:
+- 0x400
+EditorID: skyrimnet_SlaveAuction_AuctioneerMarker
+Base: 000034:Skyrim.esm
+Placement:
+  Position: 1435, 110, 55
+  Rotation: 0, 0, 4.712389

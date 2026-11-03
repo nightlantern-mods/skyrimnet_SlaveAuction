@@ -1,0 +1,12 @@
+{
+  "string": {
+    "id": "skyrimnet_SlaveAuction_carriage",
+    "name": "Carriage to Riften",
+    "plugin": "skyrimnet_SlaveAuction_ExitCarriage.esp",
+    "marker": "0x800",
+    "for": "followers_bought"
+  },
+  "int": {
+    "api_version": 1
+  }
+}

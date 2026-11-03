@@ -1,0 +1,11 @@
+# StageMarker
+MutagenObjectType: PlacedObject
+FormKey: 000901:skyrimnet_SlaveAuction.esp
+MajorRecordFlagsRaw: 1024
+SkyrimMajorRecordFlags:
+- 0x400
+EditorID: skyrimnet_SlaveAuction_StageMarker
+Base: 000034:Skyrim.esm
+Placement:
+  Position: 1455, 330, 55
+  Rotation: 0, 0, 4.712389

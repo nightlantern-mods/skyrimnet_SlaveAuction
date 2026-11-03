@@ -1,0 +1,32 @@
+FormKey: 000805:skyrimnet_SlaveAuction.esp
+EditorID: skyrimnet_SlaveAuction_Receptionist
+Configuration:
+  Flags:
+  - Female
+  - Essential
+  - AutoCalcStats
+  Level: {MutagenObjectType: PcLevelMult, LevelMult: 1}
+  CalcMinLevel: 5
+  CalcMaxLevel: 30
+  SpeedMultiplier: 100
+  TemplateFlags:
+  - Traits
+Factions:
+- Faction: 000802:skyrimnet_SlaveAuction.esp
+  Rank: 1
+Template: 039CF7:Skyrim.esm
+Voice: 013AE7:Skyrim.esm
+Race: 013746:Skyrim.esm
+Class: 01326B:Skyrim.esm
+Name:
+  TargetLanguage: English
+  Value: "Mira the Receptionist"
+AIData:
+  Aggression: Unaggressive
+  Confidence: Average
+  EnergyLevel: 50
+  Responsibility: NoCrime
+Packages:
+- 000819:skyrimnet_SlaveAuction.esp
+DefaultOutfit: 09D5E0:Skyrim.esm
+SleepingOutfit: 01697D:Skyrim.esm

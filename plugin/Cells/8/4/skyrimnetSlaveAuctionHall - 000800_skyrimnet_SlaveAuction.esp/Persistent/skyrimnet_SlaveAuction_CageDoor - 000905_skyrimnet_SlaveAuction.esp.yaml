@@ -1,0 +1,11 @@
+# CageDoor
+MutagenObjectType: PlacedObject
+FormKey: 000905:skyrimnet_SlaveAuction.esp
+MajorRecordFlagsRaw: 1024
+SkyrimMajorRecordFlags:
+- 0x400
+EditorID: skyrimnet_SlaveAuction_CageDoor
+Base: 040BB2:Skyrim.esm
+Placement:
+  Position: 123, 896.0, 0
+  Rotation: 0, 0, 0.0

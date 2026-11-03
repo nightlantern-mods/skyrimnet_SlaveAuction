@@ -1,0 +1,7 @@
+# COCMarker
+MutagenObjectType: PlacedObject
+FormKey: 00099C:skyrimnet_SlaveAuction.esp
+Base: 000032:Skyrim.esm
+Placement:
+  Position: -768, 648, 0
+  Rotation: 0, 0, 3.1415927

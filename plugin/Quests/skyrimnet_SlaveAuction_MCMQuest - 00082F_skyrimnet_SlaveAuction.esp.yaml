@@ -1,0 +1,21 @@
+FormKey: 00082F:skyrimnet_SlaveAuction.esp
+EditorID: skyrimnet_SlaveAuction_MCMQuest
+VirtualMachineAdapter:
+  Scripts:
+  - Name: skyrimnet_SlaveAuction_MCM
+  FileName: ''
+  Aliases:
+  - Property:
+      Name: ''
+      Object: 00082F:skyrimnet_SlaveAuction.esp
+      Alias: 0
+    Scripts:
+    - Name: SKI_PlayerLoadGameAlias
+Flags:
+- StartGameEnabled
+NextAliasID: 1
+Aliases:
+- Name: Player
+  Flags: []
+  ForcedReference: 000014:Skyrim.esm
+  VoiceTypes: Null

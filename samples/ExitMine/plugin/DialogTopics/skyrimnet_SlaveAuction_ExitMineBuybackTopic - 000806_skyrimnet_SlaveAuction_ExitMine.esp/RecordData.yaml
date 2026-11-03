@@ -1,0 +1,9 @@
+FormKey: 000806:skyrimnet_SlaveAuction_ExitMine.esp
+EditorID: skyrimnet_SlaveAuction_ExitMineBuybackTopic
+Name:
+  TargetLanguage: English
+  Value: "(Buy back someone who was sold to you)"
+Priority: 50
+Quest: 000801:skyrimnet_SlaveAuction_ExitMine.esp
+SubtypeName: CUST
+Branch: 000805:skyrimnet_SlaveAuction_ExitMine.esp

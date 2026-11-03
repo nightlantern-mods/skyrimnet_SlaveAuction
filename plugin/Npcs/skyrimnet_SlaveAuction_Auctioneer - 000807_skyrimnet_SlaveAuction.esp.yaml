@@ -1,0 +1,31 @@
+FormKey: 000807:skyrimnet_SlaveAuction.esp
+EditorID: skyrimnet_SlaveAuction_Auctioneer
+Configuration:
+  Flags:
+  - Essential
+  - AutoCalcStats
+  Level: {MutagenObjectType: PcLevelMult, LevelMult: 1}
+  CalcMinLevel: 5
+  CalcMaxLevel: 30
+  SpeedMultiplier: 100
+  TemplateFlags:
+  - Traits
+Factions:
+- Faction: 000802:skyrimnet_SlaveAuction.esp
+  Rank: 3
+Template: 039CF6:Skyrim.esm
+Voice: 013AE6:Skyrim.esm
+Race: 013746:Skyrim.esm
+Class: 01326B:Skyrim.esm
+Name:
+  TargetLanguage: English
+  Value: "Marcus the Auctioneer"
+AIData:
+  Aggression: Unaggressive
+  Confidence: Average
+  EnergyLevel: 50
+  Responsibility: NoCrime
+Packages:
+- 000819:skyrimnet_SlaveAuction.esp
+DefaultOutfit: 09D5E0:Skyrim.esm
+SleepingOutfit: 01697D:Skyrim.esm

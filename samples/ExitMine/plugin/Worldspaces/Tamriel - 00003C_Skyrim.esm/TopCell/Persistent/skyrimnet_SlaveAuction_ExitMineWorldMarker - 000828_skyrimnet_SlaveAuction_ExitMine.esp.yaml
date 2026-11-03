@@ -1,0 +1,18 @@
+MutagenObjectType: PlacedObject
+FormKey: 000828:skyrimnet_SlaveAuction_ExitMine.esp
+MajorRecordFlagsRaw: 1024
+SkyrimMajorRecordFlags:
+- 0x400
+EditorID: skyrimnet_SlaveAuction_ExitMineWorldMarker
+Base: 000010:Skyrim.esm
+MapMarker:
+  Flags:
+  - Visible
+  - CanTravelTo
+  Name:
+    TargetLanguage: English
+    Value: Abandoned Mine
+  Type: Mine
+Placement:
+  Position: 177803.44, -83353.66, 8720.0
+  Rotation: 0, 0, 2.1786945

@@ -1,0 +1,18 @@
+FormKey: 000803:skyrimnet_SlaveAuction_ExitMine.esp
+EditorID: skyrimnet_SlaveAuction_ExitMineRockFace
+VirtualMachineAdapter:
+  Scripts:
+  - Name: skyrimnet_SlaveAuction_ExitMineRock
+ObjectBounds:
+  First: -271, -269, -50
+  Second: 231, 245, 67
+Name:
+  TargetLanguage: English
+  Value: Rock Face
+Model:
+  File: Dungeons\Mines\Ore\MineOreCorundum01.nif
+MarkerColor: '#00CC4C33'
+ActivateTextOverride:
+  TargetLanguage: English
+  Value: Dig
+Flags: []

@@ -1,0 +1,15 @@
+# Buyer02
+MutagenObjectType: PlacedNpc
+FormKey: 000915:skyrimnet_SlaveAuction.esp
+MajorRecordFlagsRaw: 1024
+EditorID: skyrimnet_SlaveAuction_Buyer02Ref
+SkyrimMajorRecordFlags:
+- 0x400
+Base: 00080A:skyrimnet_SlaveAuction.esp
+LinkedReferences:
+- Reference: 000932:skyrimnet_SlaveAuction.esp
+Placement:
+  Position: 330, 540, 0
+  Rotation: 0, 0, 1.5707963
+MajorFlags:
+- Persistent

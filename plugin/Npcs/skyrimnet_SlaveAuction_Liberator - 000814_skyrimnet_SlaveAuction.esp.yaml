@@ -1,0 +1,35 @@
+FormKey: 000814:skyrimnet_SlaveAuction.esp
+EditorID: skyrimnet_SlaveAuction_Liberator
+Configuration:
+  Flags:
+  - Protected
+  - AutoCalcStats
+  Level: {MutagenObjectType: PcLevelMult, LevelMult: 1}
+  CalcMinLevel: 5
+  CalcMaxLevel: 30
+  SpeedMultiplier: 100
+  TemplateFlags:
+  - Traits
+Factions:
+- Faction: 000816:skyrimnet_SlaveAuction.esp
+  Rank: 1
+Template: 000803:skyrimnet_SlaveAuction.esp
+Voice: 013AE6:Skyrim.esm
+Race: 013746:Skyrim.esm
+Items:
+- Item:
+    Item: 012EB7:Skyrim.esm
+    Count: 1
+Class: 013176:Skyrim.esm
+Name:
+  TargetLanguage: English
+  Value: "Liberator"
+AIData:
+  Aggression: Unaggressive
+  Confidence: Brave
+  EnergyLevel: 50
+  Responsibility: NoCrime
+Packages:
+- 0B4598:Skyrim.esm
+DefaultOutfit: 057A2A:Skyrim.esm
+SleepingOutfit: 01697D:Skyrim.esm

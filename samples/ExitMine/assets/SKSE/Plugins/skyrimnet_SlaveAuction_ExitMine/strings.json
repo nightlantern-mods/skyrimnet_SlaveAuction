@@ -1,0 +1,8 @@
+{
+  "string": {
+    "free": "You are free to go. Your belongings are in the chest.",
+    "resold": "Your followers have been sold on to the Abandoned Mine.",
+    "notYet": "Not yet",
+    "tooMuch": "You do not have that much gold."
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "id": "local.skyrimnet-slaveauction",
+  "type": "bundle",
+  "title": "SkyrimNet Slave Auction",
+  "tagline": "A secret slave auction under the stone: its staff, its buyers, its captives and the liberators know their part.",
+  "description": "Prompts for skyrimnet_SlaveAuction.esp. Puts each role of the auction into the character's profile by faction: the receptionist with her rare drink, the cage guard, the auctioneer, the twelve buyers, the liberators, and the player and followers held as captives.",
+  "author": "nightlantern-mods",
+  "tags": ["prompts"],
+  "nsfw": true,
+  "icon": "sparkles",
+  "mods": [
+    { "name": "SkyrimNet Slave Auction", "file": "skyrimnet_SlaveAuction.esp", "required": true }
+  ],
+  "languages": ["en"],
+  "version": "0.1.0",
+  "min_skyrimnet_version": "0.25.0"
+}

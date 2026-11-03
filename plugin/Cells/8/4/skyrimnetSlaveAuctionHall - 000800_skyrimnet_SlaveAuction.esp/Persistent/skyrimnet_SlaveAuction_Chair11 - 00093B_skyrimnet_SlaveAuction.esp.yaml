@@ -1,0 +1,11 @@
+# Chair11
+MutagenObjectType: PlacedObject
+FormKey: 00093B:skyrimnet_SlaveAuction.esp
+MajorRecordFlagsRaw: 1024
+SkyrimMajorRecordFlags:
+- 0x400
+EditorID: skyrimnet_SlaveAuction_Chair11
+Base: 02EC1C:Skyrim.esm
+Placement:
+  Position: 900, 540, 0
+  Rotation: 0, 0, 1.5707963

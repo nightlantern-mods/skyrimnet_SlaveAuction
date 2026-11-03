@@ -1,0 +1,54 @@
+FormKey: 000838:skyrimnet_SlaveAuction.esp
+PreviousDialog: Null
+VirtualMachineAdapter:
+  Scripts:
+  - Name: skyrimnet_SlaveAuctionTIF_Buyback
+  ScriptFragments:
+    MutagenObjectType: ScriptFragments
+    FileName: skyrimnet_SlaveAuctionTIF_Buyback
+    OnEnd:
+      ExtraBindDataVersion: 1
+      ScriptName: skyrimnet_SlaveAuctionTIF_Buyback
+      FragmentName: Fragment_0
+Flags:
+  Flags:
+  - Goodbye
+FavorLevel: None
+Responses:
+- EmotionValue: 50
+  ResponseNumber: 1
+  Unknown2: 0x000000
+  Unknown3: 0x000000
+  Text:
+    TargetLanguage: English
+    Value: "Certainly. For the right price, a new owner can always be persuaded."
+  ScriptNotes: ''
+  Edits: ''
+Conditions:
+- MutagenObjectType: ConditionFloat
+  Unknown1: 0x000000
+  Data:
+    MutagenObjectType: GetIsIDConditionData
+    Object: 000805:skyrimnet_SlaveAuction.esp
+  ComparisonValue: 1
+- MutagenObjectType: ConditionFloat
+  CompareOperator: NotEqualTo
+  Unknown1: 0x000000
+  Data:
+    MutagenObjectType: GetGlobalValueConditionData
+    Global: 000818:skyrimnet_SlaveAuction.esp
+  ComparisonValue: 1
+- MutagenObjectType: ConditionFloat
+  CompareOperator: NotEqualTo
+  Unknown1: 0x000000
+  Data:
+    MutagenObjectType: GetGlobalValueConditionData
+    Global: 000818:skyrimnet_SlaveAuction.esp
+  ComparisonValue: 2
+- MutagenObjectType: ConditionFloat
+  CompareOperator: NotEqualTo
+  Unknown1: 0x000000
+  Data:
+    MutagenObjectType: GetGlobalValueConditionData
+    Global: 000832:skyrimnet_SlaveAuction.esp
+  ComparisonValue: 0

@@ -1,0 +1,11 @@
+# ExitAreaMarker
+MutagenObjectType: PlacedObject
+FormKey: 000903:skyrimnet_SlaveAuction.esp
+MajorRecordFlagsRaw: 1024
+SkyrimMajorRecordFlags:
+- 0x400
+EditorID: skyrimnet_SlaveAuction_ExitAreaMarker
+Base: 000034:Skyrim.esm
+Placement:
+  Position: 53, 256, 0
+  Rotation: 0, 0, 1.5707963

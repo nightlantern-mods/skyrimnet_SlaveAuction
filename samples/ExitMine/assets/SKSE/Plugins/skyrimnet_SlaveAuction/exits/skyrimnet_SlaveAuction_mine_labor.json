@@ -1,0 +1,16 @@
+{
+  "string": {
+    "id": "skyrimnet_SlaveAuction_mine_labor",
+    "name": "Forced Labor in the Mine",
+    "plugin": "skyrimnet_SlaveAuction_ExitMine.esp",
+    "marker": "0x810",
+    "event": "skyrimnet_SlaveAuction_ExitMine_PlayerSold",
+    "for": "player_sold",
+    "buyer_name": "Mine Overseer",
+    "buyer_role": "A hard, plain-spoken mine overseer buying cheap labour for a worked-out mine, with money to spare and no patience."
+  },
+  "int": {
+    "api_version": 1,
+    "buyer_female": 0
+  }
+}

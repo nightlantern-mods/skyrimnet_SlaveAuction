@@ -1,0 +1,11 @@
+# PlayerChest
+MutagenObjectType: PlacedObject
+FormKey: 000908:skyrimnet_SlaveAuction.esp
+MajorRecordFlagsRaw: 1024
+SkyrimMajorRecordFlags:
+- 0x400
+EditorID: skyrimnet_SlaveAuction_PlayerChest
+Base: 0F8476:Skyrim.esm
+Placement:
+  Position: -62, -47, 0
+  Rotation: 0, 0, 1.5707963

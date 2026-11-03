@@ -1,0 +1,9 @@
+kind: lists
+name: Slave Auction player choices
+description: Keeps the LLM from firing the auction's lines; the drink and the next lot are the player's own choices.
+blacklist:
+  - skyrimnet_SlaveAuction_Quest
+  - skyrimnet_SlaveAuctionTIF_Drink
+  - skyrimnet_SlaveAuctionTIF_Choose
+  - skyrimnet_SlaveAuctionTIF_Offer
+  - skyrimnet_SlaveAuctionTIF_Buyback

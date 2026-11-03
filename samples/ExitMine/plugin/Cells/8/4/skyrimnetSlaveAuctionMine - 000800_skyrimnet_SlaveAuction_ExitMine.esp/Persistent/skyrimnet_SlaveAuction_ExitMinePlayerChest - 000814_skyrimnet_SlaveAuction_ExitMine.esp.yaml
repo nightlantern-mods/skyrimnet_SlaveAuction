@@ -1,0 +1,10 @@
+MutagenObjectType: PlacedObject
+FormKey: 000814:skyrimnet_SlaveAuction_ExitMine.esp
+MajorRecordFlagsRaw: 1024
+SkyrimMajorRecordFlags:
+- 0x400
+EditorID: skyrimnet_SlaveAuction_ExitMinePlayerChest
+Base: 0F8476:Skyrim.esm
+Placement:
+  Position: -47, 300.0, 15.6
+  Rotation: 0, 0, 1.5707963

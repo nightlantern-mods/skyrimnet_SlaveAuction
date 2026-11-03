@@ -1,0 +1,29 @@
+FormKey: 000F00:skyrimnet_SlaveAuction_ExitMine.esp
+Data:
+  Parent:
+    MutagenObjectType: CellNavmeshParent
+    Parent: 000800:skyrimnet_SlaveAuction_ExitMine.esp
+  Vertices:
+  - -87, -97, 15.6
+  - 1113, -97, 15.6
+  - 1113, 853, 15.6
+  - -87, 853, 15.6
+  Triangles:
+  - Vertices: 0, 1, 2
+    EdgeLink_0_1: -1
+    EdgeLink_1_2: -1
+    EdgeLink_2_0: 1
+    Flags:
+    - Found
+  - Vertices: 0, 2, 3
+    EdgeLink_0_1: 0
+    EdgeLink_1_2: -1
+    EdgeLink_2_0: -1
+    Flags:
+    - Found
+  NavmeshGridDivisor: 1
+  MaxDistanceX: 1200
+  MaxDistanceY: 950
+  Min: -87, -97, 15.6
+  Max: 1113, 853, 15.6
+  NavmeshGrid: 0x0200000000000100

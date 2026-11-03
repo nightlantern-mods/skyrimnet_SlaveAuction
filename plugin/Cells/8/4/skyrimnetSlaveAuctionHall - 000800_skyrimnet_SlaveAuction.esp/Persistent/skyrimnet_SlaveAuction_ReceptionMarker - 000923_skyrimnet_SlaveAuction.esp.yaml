@@ -1,0 +1,11 @@
+# ReceptionMarker
+MutagenObjectType: PlacedObject
+FormKey: 000923:skyrimnet_SlaveAuction.esp
+MajorRecordFlagsRaw: 1024
+SkyrimMajorRecordFlags:
+- 0x400
+EditorID: skyrimnet_SlaveAuction_ReceptionMarker
+Base: 000034:Skyrim.esm
+Placement:
+  Position: -1061, 380, 0
+  Rotation: 0, 0, 1.5707963

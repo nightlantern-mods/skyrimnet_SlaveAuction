@@ -1,0 +1,7 @@
+FormKey: 000823:skyrimnet_SlaveAuction.esp
+EditorID: skyrimnet_SlaveAuction_ChooseBranch
+Quest: 000801:skyrimnet_SlaveAuction.esp
+Category: Player
+Flags:
+- TopLevel
+StartingTopic: 000824:skyrimnet_SlaveAuction.esp

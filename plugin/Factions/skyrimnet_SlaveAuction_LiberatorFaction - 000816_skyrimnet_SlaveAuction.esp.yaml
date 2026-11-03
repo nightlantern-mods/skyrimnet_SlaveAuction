@@ -1,0 +1,7 @@
+FormKey: 000816:skyrimnet_SlaveAuction.esp
+EditorID: skyrimnet_SlaveAuction_LiberatorFaction
+Name:
+  TargetLanguage: English
+  Value: Slave Auction Liberator
+Flags:
+- HiddenFromPC

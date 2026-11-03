@@ -1,0 +1,10 @@
+MutagenObjectType: PlacedObject
+FormKey: 000800:skyrimnet_SlaveAuction_ExitCarriage.esp
+MajorRecordFlagsRaw: 1024
+SkyrimMajorRecordFlags:
+- 0x400
+EditorID: skyrimnet_SlaveAuction_ExitCarriageMarker
+Base: 000034:Skyrim.esm
+Placement:
+  Position: 172497.1, -91089.555, 11121.254
+  Rotation: 0, 0, 1.2300009

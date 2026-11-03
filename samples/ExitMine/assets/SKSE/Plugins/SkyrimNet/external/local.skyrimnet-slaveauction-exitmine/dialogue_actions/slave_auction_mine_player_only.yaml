@@ -1,0 +1,6 @@
+kind: lists
+name: Slave Auction mine player choices
+description: Keeps the LLM from firing the buyback line; paying the overseer is the player's own choice.
+blacklist:
+  - skyrimnet_SlaveAuction_ExitMineQuest
+  - skyrimnet_SlaveAuction_ExitMineTIF

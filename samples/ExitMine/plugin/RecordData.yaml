@@ -1,0 +1,5 @@
+ModKey: skyrimnet_SlaveAuction_ExitMine.esp
+GameRelease: SkyrimSE
+ModHeader:
+  Flags:
+  - Small

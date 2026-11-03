@@ -1,0 +1,30 @@
+FormKey: 000801:skyrimnet_SlaveAuction_ExitMine.esp
+EditorID: skyrimnet_SlaveAuction_ExitMineQuest
+VirtualMachineAdapter:
+  Scripts:
+  - Name: skyrimnet_SlaveAuction_ExitMine
+  FileName: ''
+  Aliases:
+  - Property:
+      Name: ''
+      Object: 000801:skyrimnet_SlaveAuction_ExitMine.esp
+      Alias: 1
+    Scripts:
+    - Name: skyrimnet_SlaveAuction_ExitMineBoss
+Priority: 60
+Flags:
+- StartGameEnabled
+NextAliasID: 2
+Aliases:
+- Name: Player
+  Flags: []
+  ForcedReference: 000014:Skyrim.esm
+  VoiceTypes: Null
+- ID: 1
+  Name: Overseer
+  Flags:
+  - Optional
+  - AllowReuseInQuest
+  - AllowDisabled
+  - AllowDead
+  VoiceTypes: Null

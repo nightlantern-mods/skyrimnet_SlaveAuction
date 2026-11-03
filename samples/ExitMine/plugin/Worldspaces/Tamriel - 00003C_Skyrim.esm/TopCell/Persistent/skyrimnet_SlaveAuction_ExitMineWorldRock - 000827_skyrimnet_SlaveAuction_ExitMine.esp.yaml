@@ -1,0 +1,10 @@
+MutagenObjectType: PlacedObject
+FormKey: 000827:skyrimnet_SlaveAuction_ExitMine.esp
+MajorRecordFlagsRaw: 1024
+SkyrimMajorRecordFlags:
+- 0x400
+EditorID: skyrimnet_SlaveAuction_ExitMineWorldRock
+Base: 0E0BA5:Skyrim.esm
+Placement:
+  Position: 178231.44, -83749.99, 8714.89
+  Rotation: 0.0, 0.0, 3.6774945

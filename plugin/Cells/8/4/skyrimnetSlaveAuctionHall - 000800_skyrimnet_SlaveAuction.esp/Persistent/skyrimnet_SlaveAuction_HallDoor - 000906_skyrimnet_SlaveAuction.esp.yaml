@@ -1,0 +1,11 @@
+# HallDoor
+MutagenObjectType: PlacedObject
+FormKey: 000906:skyrimnet_SlaveAuction.esp
+MajorRecordFlagsRaw: 1024
+SkyrimMajorRecordFlags:
+- 0x400
+EditorID: skyrimnet_SlaveAuction_HallDoor
+Base: 042035:Skyrim.esm
+Placement:
+  Position: -128.0, 256, 0
+  Rotation: 0, 0, 4.712389

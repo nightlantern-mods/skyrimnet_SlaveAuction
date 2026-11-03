@@ -1,0 +1,7 @@
+FormKey: 000805:skyrimnet_SlaveAuction_ExitMine.esp
+EditorID: skyrimnet_SlaveAuction_ExitMineBuybackBranch
+Quest: 000801:skyrimnet_SlaveAuction_ExitMine.esp
+Category: Player
+Flags:
+- TopLevel
+StartingTopic: 000806:skyrimnet_SlaveAuction_ExitMine.esp

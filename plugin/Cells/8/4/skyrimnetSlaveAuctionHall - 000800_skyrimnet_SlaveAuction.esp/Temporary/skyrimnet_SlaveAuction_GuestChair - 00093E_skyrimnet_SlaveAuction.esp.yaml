@@ -1,0 +1,8 @@
+# GuestChair
+MutagenObjectType: PlacedObject
+FormKey: 00093E:skyrimnet_SlaveAuction.esp
+EditorID: skyrimnet_SlaveAuction_GuestChair
+Base: 02EC1C:Skyrim.esm
+Placement:
+  Position: 710, 750, 0
+  Rotation: 0, 0, 1.5707963

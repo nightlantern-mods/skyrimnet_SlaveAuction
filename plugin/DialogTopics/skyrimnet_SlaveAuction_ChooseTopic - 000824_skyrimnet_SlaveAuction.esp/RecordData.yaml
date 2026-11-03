@@ -1,0 +1,9 @@
+FormKey: 000824:skyrimnet_SlaveAuction.esp
+EditorID: skyrimnet_SlaveAuction_ChooseTopic
+Name:
+  TargetLanguage: English
+  Value: "(Name who goes up for sale next)"
+Priority: 50
+Quest: 000801:skyrimnet_SlaveAuction.esp
+SubtypeName: CUST
+Branch: 000823:skyrimnet_SlaveAuction.esp

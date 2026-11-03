@@ -1,0 +1,33 @@
+FormKey: 000801:skyrimnet_SlaveAuction.esp
+EditorID: skyrimnet_SlaveAuction_Quest
+VirtualMachineAdapter:
+  Scripts:
+  - Name: skyrimnet_SlaveAuction
+  FileName: ''
+  Aliases:
+  - Property:
+      Name: ''
+      Object: 000801:skyrimnet_SlaveAuction.esp
+      Alias: 0
+    Scripts:
+    - Name: skyrimnet_SlaveAuctionPlayer
+  - Property:
+      Name: ''
+      Object: 000801:skyrimnet_SlaveAuction.esp
+      Alias: 1
+    Scripts:
+    - Name: skyrimnet_SlaveAuctionDoor
+Priority: 60
+Flags:
+- StartGameEnabled
+NextAliasID: 3
+Aliases:
+- Name: Player
+  Flags: []
+  ForcedReference: 000014:Skyrim.esm
+  VoiceTypes: Null
+- ID: 1
+  Name: OutsideDoor
+  Flags: []
+  ForcedReference: 000907:skyrimnet_SlaveAuction.esp
+  VoiceTypes: Null

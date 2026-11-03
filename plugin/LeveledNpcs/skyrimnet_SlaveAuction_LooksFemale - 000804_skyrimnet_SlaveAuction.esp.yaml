@@ -1,0 +1,46 @@
+FormKey: 000804:skyrimnet_SlaveAuction.esp
+EditorID: skyrimnet_SlaveAuction_LooksFemale
+Flags:
+- CalculateFromAllLevelsLessThanOrEqualPlayer
+- CalculateForEachItemInCount
+Entries:
+- Data:
+    Level: 1
+    Reference: 0BFB45:Skyrim.esm
+    Count: 1
+- Data:
+    Level: 1
+    Reference: 0BFB48:Skyrim.esm
+    Count: 1
+- Data:
+    Level: 1
+    Reference: 0BFB47:Skyrim.esm
+    Count: 1
+- Data:
+    Level: 1
+    Reference: 0BFB46:Skyrim.esm
+    Count: 1
+- Data:
+    Level: 1
+    Reference: 039CF7:Skyrim.esm
+    Count: 1
+- Data:
+    Level: 1
+    Reference: 039CF5:Skyrim.esm
+    Count: 1
+- Data:
+    Level: 1
+    Reference: 039CF8:Skyrim.esm
+    Count: 1
+- Data:
+    Level: 1
+    Reference: 03DE87:Skyrim.esm
+    Count: 1
+- Data:
+    Level: 1
+    Reference: 03DE89:Skyrim.esm
+    Count: 1
+- Data:
+    Level: 1
+    Reference: 03DE8C:Skyrim.esm
+    Count: 1

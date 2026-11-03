@@ -1,0 +1,15 @@
+# Receptionist
+MutagenObjectType: PlacedNpc
+FormKey: 000910:skyrimnet_SlaveAuction.esp
+MajorRecordFlagsRaw: 1024
+EditorID: skyrimnet_SlaveAuction_ReceptionistRef
+SkyrimMajorRecordFlags:
+- 0x400
+Base: 000805:skyrimnet_SlaveAuction.esp
+LinkedReferences:
+- Reference: 000923:skyrimnet_SlaveAuction.esp
+Placement:
+  Position: -1061, 380, 0
+  Rotation: 0, 0, 1.5707963
+MajorFlags:
+- Persistent

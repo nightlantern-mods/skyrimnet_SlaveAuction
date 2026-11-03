@@ -1,0 +1,39 @@
+FormKey: 000825:skyrimnet_SlaveAuction.esp
+PreviousDialog: Null
+VirtualMachineAdapter:
+  Scripts:
+  - Name: skyrimnet_SlaveAuctionTIF_Choose
+  ScriptFragments:
+    MutagenObjectType: ScriptFragments
+    FileName: skyrimnet_SlaveAuctionTIF_Choose
+    OnEnd:
+      ExtraBindDataVersion: 1
+      ScriptName: skyrimnet_SlaveAuctionTIF_Choose
+      FragmentName: Fragment_0
+Flags:
+  Flags:
+  - Goodbye
+FavorLevel: None
+Responses:
+- EmotionValue: 50
+  ResponseNumber: 1
+  Unknown2: 0x000000
+  Unknown3: 0x000000
+  Text:
+    TargetLanguage: English
+    Value: "Well? Give me a name."
+  ScriptNotes: ''
+  Edits: ''
+Conditions:
+- MutagenObjectType: ConditionFloat
+  Unknown1: 0x000000
+  Data:
+    MutagenObjectType: GetIsIDConditionData
+    Object: 000806:skyrimnet_SlaveAuction.esp
+  ComparisonValue: 1
+- MutagenObjectType: ConditionFloat
+  Unknown1: 0x000000
+  Data:
+    MutagenObjectType: GetGlobalValueConditionData
+    Global: 000818:skyrimnet_SlaveAuction.esp
+  ComparisonValue: 1

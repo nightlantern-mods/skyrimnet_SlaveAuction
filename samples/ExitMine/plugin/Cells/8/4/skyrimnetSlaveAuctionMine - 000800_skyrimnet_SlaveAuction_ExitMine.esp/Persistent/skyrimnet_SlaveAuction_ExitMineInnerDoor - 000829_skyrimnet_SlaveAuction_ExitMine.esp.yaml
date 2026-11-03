@@ -1,0 +1,17 @@
+MutagenObjectType: PlacedObject
+FormKey: 000829:skyrimnet_SlaveAuction_ExitMine.esp
+MajorRecordFlagsRaw: 1024
+SkyrimMajorRecordFlags:
+- 0x400
+EditorID: skyrimnet_SlaveAuction_ExitMineInnerDoor
+Base: 04203A:Skyrim.esm
+TeleportDestination:
+  Door: 000826:skyrimnet_SlaveAuction_ExitMine.esp
+  Position: 177860.9, -83393.64, 8720.0
+  Rotation: 0, 0, 5.3202872
+VirtualMachineAdapter:
+  Scripts:
+  - Name: skyrimnet_SlaveAuction_ExitMineDoor
+Placement:
+  Position: 512, 896, 0.0
+  Rotation: 0, 0, 0.0

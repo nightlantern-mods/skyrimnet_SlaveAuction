@@ -1,0 +1,11 @@
+# BuyerExitMarker
+MutagenObjectType: PlacedObject
+FormKey: 00090F:skyrimnet_SlaveAuction.esp
+MajorRecordFlagsRaw: 1024
+SkyrimMajorRecordFlags:
+- 0x400
+EditorID: skyrimnet_SlaveAuction_BuyerExitMarker
+Base: 000034:Skyrim.esm
+Placement:
+  Position: -17, 366, 0
+  Rotation: 0, 0, 3.1415927

@@ -1,0 +1,12 @@
+FormKey: 012FB4:Skyrim.esm
+VersionControl: 3696904
+FormVersion: 40
+Version2: 14
+NavMeshVersion: 12
+MapInfos:
+- NavigationMesh: 000F00:skyrimnet_SlaveAuction_ExitMine.esp
+  Point: 513.0, 300.0, 15.6
+  Unknown2: -1511415748
+  Parent:
+    MutagenObjectType: NavigationMapInfoCellParent
+    ParentCell: 000800:skyrimnet_SlaveAuction_ExitMine.esp

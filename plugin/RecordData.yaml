@@ -1,0 +1,5 @@
+ModKey: skyrimnet_SlaveAuction.esp
+GameRelease: SkyrimSE
+ModHeader:
+  Flags:
+  - Small

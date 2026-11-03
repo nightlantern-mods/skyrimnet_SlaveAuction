@@ -1,0 +1,11 @@
+# HoldingMarker
+MutagenObjectType: PlacedObject
+FormKey: 000904:skyrimnet_SlaveAuction.esp
+MajorRecordFlagsRaw: 1024
+SkyrimMajorRecordFlags:
+- 0x400
+EditorID: skyrimnet_SlaveAuction_HoldingMarker
+Base: 000034:Skyrim.esm
+Placement:
+  Position: 3200.0, 128.0, 0
+  Rotation: 0, 0, 0.0

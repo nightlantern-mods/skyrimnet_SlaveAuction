@@ -1,0 +1,6 @@
+MutagenObjectType: PlacedObject
+FormKey: 000945:skyrimnet_SlaveAuction.esp
+Base: 029994:Skyrim.esm
+Placement:
+  Position: 0, 1280, 0
+  Rotation: 0, 0, 0.0

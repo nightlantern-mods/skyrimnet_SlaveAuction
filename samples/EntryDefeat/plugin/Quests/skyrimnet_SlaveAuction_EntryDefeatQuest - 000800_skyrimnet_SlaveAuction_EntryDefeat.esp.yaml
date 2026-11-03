@@ -1,0 +1,92 @@
+FormKey: 000800:skyrimnet_SlaveAuction_EntryDefeat.esp
+EditorID: skyrimnet_SlaveAuction_EntryDefeatQuest
+VirtualMachineAdapter:
+  Scripts:
+  - Name: skyrimnet_SlaveAuction_EntryDefeatMCM
+  FileName: ''
+  Aliases:
+  - Property:
+      Name: ''
+      Object: 000800:skyrimnet_SlaveAuction_EntryDefeat.esp
+      Alias: 0
+    Scripts:
+    - Name: SKI_PlayerLoadGameAlias
+    - Name: skyrimnet_SlaveAuction_EntryDefeat
+Flags:
+- StartGameEnabled
+NextAliasID: 11
+Aliases:
+- Name: Player
+  Flags: []
+  ForcedReference: 000014:Skyrim.esm
+  VoiceTypes: Null
+- ID: 1
+  Name: Follower1
+  Flags:
+  - Optional
+  - Essential
+  - AllowReuseInQuest
+  VoiceTypes: Null
+- ID: 2
+  Name: Follower2
+  Flags:
+  - Optional
+  - Essential
+  - AllowReuseInQuest
+  VoiceTypes: Null
+- ID: 3
+  Name: Follower3
+  Flags:
+  - Optional
+  - Essential
+  - AllowReuseInQuest
+  VoiceTypes: Null
+- ID: 4
+  Name: Follower4
+  Flags:
+  - Optional
+  - Essential
+  - AllowReuseInQuest
+  VoiceTypes: Null
+- ID: 5
+  Name: Follower5
+  Flags:
+  - Optional
+  - Essential
+  - AllowReuseInQuest
+  VoiceTypes: Null
+- ID: 6
+  Name: Follower6
+  Flags:
+  - Optional
+  - Essential
+  - AllowReuseInQuest
+  VoiceTypes: Null
+- ID: 7
+  Name: Follower7
+  Flags:
+  - Optional
+  - Essential
+  - AllowReuseInQuest
+  VoiceTypes: Null
+- ID: 8
+  Name: Follower8
+  Flags:
+  - Optional
+  - Essential
+  - AllowReuseInQuest
+  VoiceTypes: Null
+- ID: 9
+  Name: Follower9
+  Flags:
+  - Optional
+  - Essential
+  - AllowReuseInQuest
+  VoiceTypes: Null
+- ID: 10
+  Name: Follower10
+  Flags:
+  - Optional
+  - Essential
+  - AllowReuseInQuest
+  VoiceTypes: Null

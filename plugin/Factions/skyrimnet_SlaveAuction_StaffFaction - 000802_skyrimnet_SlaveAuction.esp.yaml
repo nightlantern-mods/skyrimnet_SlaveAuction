@@ -1,0 +1,7 @@
+FormKey: 000802:skyrimnet_SlaveAuction.esp
+EditorID: skyrimnet_SlaveAuction_StaffFaction
+Name:
+  TargetLanguage: English
+  Value: Slave Auction Staff
+Flags:
+- HiddenFromPC

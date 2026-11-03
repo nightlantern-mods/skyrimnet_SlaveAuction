@@ -1,0 +1,18 @@
+MutagenObjectType: PlacedObject
+FormKey: 00082D:skyrimnet_SlaveAuction.esp
+MajorRecordFlagsRaw: 1024
+EditorID: skyrimnet_SlaveAuction_WorldMarker
+SkyrimMajorRecordFlags:
+- 0x400
+Base: 000010:Skyrim.esm
+MapMarker:
+  Flags:
+  - Visible
+  - CanTravelTo
+  Name:
+    TargetLanguage: English
+    Value: Underground Auction Hall
+  Type: Cave
+Placement:
+  Position: 171203.71, -84975.07, 10098.78
+  Rotation: 0, 0, 0.9054768
