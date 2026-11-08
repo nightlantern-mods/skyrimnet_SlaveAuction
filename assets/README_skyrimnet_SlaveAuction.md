@@ -6,9 +6,9 @@ This mod is for adult players. It shows captivity and nudity.
 
 ## If you have used 0.1.0: run the repair once
 
-**Version 0.1.0 changed SkyrimNet's settings for other mods.** On every auction it rewrote the cooldowns of 39 AI actions that other mods add to SkyrimNet (restraints, kidnapping, fights and brawls, dressing), and SkyrimNet saved them in its `Actions.yaml`. Those mods then behave differently, also outside the auction, and removing this mod does not undo it.
+**Version 0.1.0 changed SkyrimNet's settings for other mods.** On every auction it rewrote the cooldowns of some actions that other mods add to SkyrimNet (restraints, kidnapping, fights, dressing and more: up to 39 actions, only those of mods you have installed), and SkyrimNet saved them in its `Actions.yaml`. Those mods then behave differently, even outside the auction.
 
-- **You have run at least one auction with 0.1.0:** update to 0.1.1, then run the separate download **SkyrimNet Actions Repair** once, with the game closed. Its README says how.
+- **You ran an auction with 0.1.0:** update to 0.1.1, then run the separate download **SkyrimNet Actions Repair** once, with the game closed. Its README says how.
 - **You start with 0.1.1 or later, or never ran an auction with 0.1.0:** you do not need the repair. 0.1.1 never touches SkyrimNet's settings.
 
 ## Requirements

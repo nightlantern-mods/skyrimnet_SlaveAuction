@@ -4,15 +4,15 @@
 [English]
 
 WHO NEEDS THIS
-- You have run at least one auction with SkyrimNet Slave Auction 0.1.0: use this once.
+- You ran an auction with SkyrimNet Slave Auction 0.1.0: use this once.
 - You started with 0.1.1 or later, or never ran an auction with 0.1.0: you do not need it.
 
 WHY
-0.1.0 rewrote the cooldowns of 39 AI actions that other mods add to SkyrimNet (restraints,
-kidnapping, fights and brawls, dressing) on every auction, and SkyrimNet saved them in its
-Actions.yaml. Those mods then behave differently, also outside the auction, and removing
-SkyrimNet Slave Auction does not undo it. This tool removes those entries, so each action goes back
-to the default its own mod gives it.
+0.1.0 rewrote, on every auction, the cooldowns of some actions that other mods add to SkyrimNet
+(restraints, kidnapping, fights, dressing and more: up to 39 actions, only those of mods you have
+installed), and SkyrimNet saved them in its Actions.yaml. Those mods then behave differently, even
+outside the auction. This tool removes those entries, so each action goes back to the default its
+own mod gives it.
 
 WHAT IT CHANGES
 - Only entries that hold exactly what 0.1.0 left: the action switched on, with a cooldown of 0 or
@@ -40,15 +40,14 @@ Delete Actions.yaml (if it is there) and rename Actions.yaml.bak to Actions.yaml
 [日本語]
 
 使う必要がある人
-- SkyrimNet Slave Auction 0.1.0 で競売を 1 回でも行った方: 1 回だけ使ってください。
+- SkyrimNet Slave Auction 0.1.0 で競売を行った方: 1 回だけ使ってください。
 - 0.1.1 以降から使い始めた方、0.1.0 で競売をしていない方: 使う必要はありません。
 
 理由
-0.1.0 は競売のたびに、他の MOD が SkyrimNet に追加している AI 行動 39 種類（拘束具、誘拐、
-戦闘・喧嘩、着替えなど）の待ち時間を書き換え、SkyrimNet がそれを Actions.yaml に保存して
-いました。そのため、それらの MOD の動きが競売の外でも変わります。SkyrimNet Slave Auction を
-外しても元に戻りません。このツールはその項目を削除して、各行動をそれぞれの MOD が決めた初期値に
-戻します。
+0.1.0 は競売のたびに、他の MOD が SkyrimNet に追加している行動の一部（拘束具、誘拐、戦闘、
+着替えなど。最大 39 種類で、導入している MOD の行動だけが対象）の待ち時間を書き換え、SkyrimNet
+の設定 Actions.yaml に保存していました。そのため、それらの MOD の動きが競売の外でも変わります。
+このツールはその項目を削除して、各行動をそれぞれの MOD が決めた初期値に戻します。
 
 変更するもの
 - 0.1.0 が残した内容そのままの項目だけ（行動が有効で、待ち時間が 0 秒か 7200 秒のもの）
