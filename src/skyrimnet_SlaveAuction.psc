@@ -11,8 +11,6 @@ String Property PluginName = "skyrimnet_SlaveAuction.esp" AutoReadOnly
 String Property StringsFile = "../skyrimnet_SlaveAuction/strings.json" AutoReadOnly
 ; SkyrimNet actions that would restrain, dress or start a fight among the held. The script could not
 ; undo them. Other mods' action names can be added to this file.
-String Property BlockedActionsFile = "../skyrimnet_SlaveAuction/blocked_actions.json" AutoReadOnly
-Int Property BlockedActionSeconds = 7200 AutoReadOnly
 Int Property CaptureReasonMaxLength = 500 AutoReadOnly   ; a long string in a save can break it
 
 ; Values of skyrimnet_SlaveAuction_State, which the dialogue conditions read.
@@ -414,17 +412,10 @@ Function BindCaptives()
 	WatchBoundCaptives()
 EndFunction
 
+; 0.1.0 set SkyrimNet action cooldowns here. That did not stop an action that had not been used yet
+; (the cooldown runs from a use), and SkyrimNet saved the values to its Actions.yaml, over the player's
+; own settings. So since 0.1.1 nothing is set.
 Function SetActionsBlocked(Bool blocked)
-	Int seconds = 0
-	If blocked
-		seconds = BlockedActionSeconds
-	EndIf
-	Int count = JsonUtil.StringListCount(BlockedActionsFile, "actions")
-	Int i = 0
-	While i < count
-		SkyrimNetApi.SetActionCooldown(JsonUtil.StringListGet(BlockedActionsFile, "actions", i), seconds)
-		i += 1
-	EndWhile
 EndFunction
 
 Function WatchBoundCaptives()

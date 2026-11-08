@@ -1,4 +1,4 @@
-# SkyrimNet Slave Auction 0.1.0
+# SkyrimNet Slave Auction 0.1.1
 
 A secret slave auction in a stone basement near Riften. Get sold on its stage, or sit among the
 buyers and bid for your own followers. SkyrimNet gives everyone a voice: the staff, the twelve
@@ -8,6 +8,13 @@ Anyone can add a way in or a way out, with no master on this mod: an entry mod s
 an exit mod is one JSON file and a marker in your own plugin.
 
 **This mod is for adult players.** It shows captivity and nudity. Children are never caught.
+
+## If you have used 0.1.0: run the repair once
+
+**Version 0.1.0 changed SkyrimNet's settings for other mods.** On every auction it rewrote the cooldowns of 39 AI actions that other mods add to SkyrimNet (restraints, kidnapping, fights and brawls, dressing), and SkyrimNet saved them in its `Actions.yaml`. Those mods then behave differently, also outside the auction, and removing this mod does not undo it.
+
+- **You have run at least one auction with 0.1.0:** update to 0.1.1, then run the separate download **SkyrimNet Actions Repair** once, with the game closed. Its README says how.
+- **You start with 0.1.1 or later, or never ran an auction with 0.1.0:** you do not need the repair. 0.1.1 never touches SkyrimNet's settings.
 
 ## Requirements
 
@@ -135,7 +142,5 @@ under their own terms:
   add-on files follow its formats.
 - ZaZ Animation Pack: when installed, its cross and pose are used by name at run time.
 - Nether's Follower Framework is only named, as what the mod was tested with.
-- `blocked_actions.json` lists the names of other mods' SkyrimNet actions, so that they stay out of the
-  auction. It holds nothing else of theirs.
 
 To compile the scripts, you need the script sources of those mods.

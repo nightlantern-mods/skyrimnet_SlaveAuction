@@ -14,6 +14,11 @@ archive = zipfile.ZipFile(sys.argv[1])
 names = set(archive.namelist())
 config = ET.fromstring(archive.read("fomod/ModuleConfig.xml"))
 ET.fromstring(archive.read("fomod/info.xml"))
+# Vortex strips the encoding from the declaration only when it is in double quotes; otherwise it fails at
+# line 1, position 39 (it re-encodes the text as UTF-16 first).
+for xml_name in ("fomod/ModuleConfig.xml", "fomod/info.xml"):
+    head = archive.read(xml_name).split(b"?>", 1)[0]
+    assert b"encoding='" not in head, xml_name + ": Vortex needs the declaration's encoding in double quotes"
 patterns = []
 for p in config.find("conditionalFileInstalls/patterns"):
     needed = [d.get("flag") for d in p.find("dependencies")]

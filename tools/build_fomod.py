@@ -26,7 +26,7 @@ sys.dont_write_bytecode = True
 sys.path.insert(0, JAPANESE)
 import build_jp  # noqa: E402
 
-VERSION = sys.argv[1] if len(sys.argv) > 1 else "0.1.0"
+VERSION = sys.argv[1] if len(sys.argv) > 1 else "0.1.1"
 OUT = os.path.join(PROJECT, "dist", f"SkyrimNet Slave Auction {VERSION}.zip")
 MAIN = "skyrimnet_SlaveAuction"
 AUTHOR = "nightlantern-mods"
@@ -130,9 +130,14 @@ def el(parent, tag, text=None, **attrs):
 
 
 def xml_bytes(root):
+    # Vortex re-encodes the file as UTF-16 and strips the encoding from the declaration, but only when
+    # it is written in double quotes. ElementTree writes single ones, and Vortex then refuses the file
+    # at line 1, position 39. So the declaration is written by hand.
     ET.indent(root)
     buffer = io.BytesIO()
-    ET.ElementTree(root).write(buffer, encoding="utf-8", xml_declaration=True)
+    buffer.write(b'<?xml version="1.0" encoding="utf-8"?>
+')
+    ET.ElementTree(root).write(buffer, encoding="utf-8", xml_declaration=False)
     return buffer.getvalue()
 
 
