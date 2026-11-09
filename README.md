@@ -1,8 +1,9 @@
 # SkyrimNet Slave Auction 0.2.0
 
 A secret slave auction in a stone basement near Riften. Get sold on its stage, or sit among the
-buyers and bid for your own followers. SkyrimNet gives everyone a voice: the staff, the twelve
-buyers and the captives react to what is happening in their own words, so no two nights go alike.
+buyers and bid on whoever is in the cage: your own followers, or anyone another mod brings in.
+SkyrimNet gives everyone a voice: the staff, the twelve buyers and the captives react to what is
+happening in their own words, so no two nights go alike.
 
 Anyone can add a way in or a way out, with no master on this mod: an entry mod sends one event, and
 an exit mod is one JSON file and a marker in your own plugin.
