@@ -37,13 +37,6 @@ Conditions:
   Data:
     MutagenObjectType: GetGlobalValueConditionData
     Global: 000818:skyrimnet_SlaveAuction.esp
-  ComparisonValue: 1
-- MutagenObjectType: ConditionFloat
-  CompareOperator: NotEqualTo
-  Unknown1: 0x000000
-  Data:
-    MutagenObjectType: GetGlobalValueConditionData
-    Global: 000818:skyrimnet_SlaveAuction.esp
   ComparisonValue: 2
 - MutagenObjectType: ConditionFloat
   CompareOperator: NotEqualTo

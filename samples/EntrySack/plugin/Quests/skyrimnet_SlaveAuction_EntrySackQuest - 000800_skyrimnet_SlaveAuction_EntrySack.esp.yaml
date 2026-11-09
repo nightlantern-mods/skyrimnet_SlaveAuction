@@ -1,0 +1,36 @@
+FormKey: 000800:skyrimnet_SlaveAuction_EntrySack.esp
+EditorID: skyrimnet_SlaveAuction_EntrySackQuest
+VirtualMachineAdapter:
+  Scripts:
+  - Name: skyrimnet_SlaveAuction_EntrySack
+  FileName: ''
+  Aliases:
+  - Property:
+      Name: ''
+      Object: 000800:skyrimnet_SlaveAuction_EntrySack.esp
+      Alias: 0
+    Scripts:
+    - Name: skyrimnet_SlaveAuction_EntrySackLoad
+  - Property:
+      Name: ''
+      Object: 000800:skyrimnet_SlaveAuction_EntrySack.esp
+      Alias: 1
+    Scripts:
+    - Name: skyrimnet_SlaveAuction_EntrySackDesk
+Priority: 60
+Flags:
+- StartGameEnabled
+NextAliasID: 2
+Aliases:
+- Name: Player
+  Flags: []
+  ForcedReference: 000014:Skyrim.esm
+  VoiceTypes: Null
+- ID: 1
+  Name: Receptionist
+  Flags:
+  - Optional
+  - AllowReuseInQuest
+  - AllowDisabled
+  - AllowDead
+  VoiceTypes: Null

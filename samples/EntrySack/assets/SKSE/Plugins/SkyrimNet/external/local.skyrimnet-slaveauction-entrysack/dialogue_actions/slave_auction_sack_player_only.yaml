@@ -1,0 +1,6 @@
+kind: lists
+name: Slave Auction sack player choices
+description: Keeps the LLM from firing the hand-over line; handing people over is the player's own choice.
+blacklist:
+  - skyrimnet_SlaveAuction_EntrySackQuest
+  - skyrimnet_SlaveAuction_EntrySackTIF

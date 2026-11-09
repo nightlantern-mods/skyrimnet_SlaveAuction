@@ -267,6 +267,8 @@ CONDITION = """- MutagenObjectType: ConditionFloat
 
 # The receptionist serves anyone who is not held; the others speak in one state only.
 STATE_NOT_HELD = "not held"
+# Buying back works between lots too: the player may be a guest, and a sold lot is there at once.
+STATE_NOT_ON_STAGE = "not on stage"
 HELD_STATES = (1, 2)
 
 
@@ -278,6 +280,9 @@ def speaker_conditions(speaker, state):
                 + CONDITION.format(data="GetGlobalValueConditionData", field="Global", value=fk(STATE_GLOBAL), cmp=held) \
                 .split("\n", 1)[1]
         return conditions
+    if state == STATE_NOT_ON_STAGE:
+        return conditions + "- MutagenObjectType: ConditionFloat\n  CompareOperator: NotEqualTo\n" \
+            + CONDITION.format(data="GetGlobalValueConditionData", field="Global", value=fk(STATE_GLOBAL), cmp=2).split("\n", 1)[1]
     return conditions + CONDITION.format(data="GetGlobalValueConditionData", field="Global", value=fk(STATE_GLOBAL), cmp=state)
 
 
@@ -323,7 +328,7 @@ topic(DRINK_BRANCH, DRINK_TOPIC, DRINK_INFO, "Drink", "(Drink the rare liquor sh
 topic(OFFER_BRANCH, OFFER_TOPIC, OFFER_INFO, "Offer", "(Keep away from the drink yourself, and have your followers drink it)",
       "How generous of you. They will be well looked after.", RECEPTIONIST, STATE_NOT_HELD, "skyrimnet_SlaveAuctionTIF_Offer")
 topic(BUYBACK_BRANCH, BUYBACK_TOPIC, BUYBACK_INFO, "Buyback", "(Buy back someone who was sold)",
-      "Certainly. For the right price, a new owner can always be persuaded.", RECEPTIONIST, STATE_NOT_HELD,
+      "Certainly. For the right price, a new owner can always be persuaded.", RECEPTIONIST, STATE_NOT_ON_STAGE,
       "skyrimnet_SlaveAuctionTIF_Buyback",
       "- MutagenObjectType: ConditionFloat\n  CompareOperator: NotEqualTo\n"
       + CONDITION.format(data="GetGlobalValueConditionData", field="Global", value=fk(BUYBACK_GLOBAL), cmp=0).split("\n", 1)[1])

@@ -26,7 +26,7 @@ sys.dont_write_bytecode = True
 sys.path.insert(0, JAPANESE)
 import build_jp  # noqa: E402
 
-VERSION = sys.argv[1] if len(sys.argv) > 1 else "0.1.1"
+VERSION = sys.argv[1] if len(sys.argv) > 1 else "0.1.0"
 OUT = os.path.join(PROJECT, "dist", f"SkyrimNet Slave Auction {VERSION}.zip")
 MAIN = "skyrimnet_SlaveAuction"
 AUTHOR = "nightlantern-mods"
@@ -47,6 +47,13 @@ SAMPLES = (
      "入口：就寝中の誘拐",
      "屋外、宿屋、ダンジョンで眠ると、近くのフォロワーが競売へさらわれることがあります。"
      "専用の MCM で確率を変えられます（標準は 25%）。"),
+    ("EntrySack", MAIN + "_EntrySack", "ja_map_sack.json",
+     "Entry: Sacked Captives",
+     "Needs Diary of Mine. Carry someone to the receptionist's room in a sack, take them out tied up, "
+     "and hand them over to be sold. When another buyer wins them, you get half the price.",
+     "入口：袋詰めの引き渡し",
+     "Diary of Mine が必要です。袋詰めにした人を受付の部屋で縛った状態で取り出し、受付に引き渡すと競売にかけられます。"
+     "他の買い手が落札すると、落札額の半分を受け取ります。"),
     ("ExitMine", MAIN + "_ExitMine", "ja_map_mine.json",
      "Exit: The Mine",
      "Sold, you work a mine until the quota is met. Followers sold to another buyer wait there to be bought back. "
@@ -54,11 +61,31 @@ SAMPLES = (
      "出口：鉱山",
      "売られると、ノルマを終えるまで鉱山で働きます。他の買い手に売られたフォロワーは、鉱山で買い戻せます。"
      "これを入れると、MCM で出口を無効にしない限り、解放戦線の結末は起きなくなります。"),
+    ("ExitDebt", MAIN + "_ExitDebt", None,
+     "Exit: Set Free in Debt",
+     "A moneylender takes a seat and wins every lot you do not buy, then sets each free at once, owing three times "
+     "the price: followers come back to you, others go home. Needs the IOU Ledger add-on, which is installed with it.",
+     "出口：借金を背負って解放",
+     "金融屋が席に着き、あなたが買わなかった人をすべて落札します。落札された人は、落札額の 3 倍の借金を背負って、すぐに解放されます。"
+     "フォロワーはあなたの元へ戻り、それ以外の人は家へ帰ります。追加 MOD の借用書台帳が必要で、一緒に導入されます。"),
     ("ExitCarriage", MAIN + "_ExitCarriage", None,
      "Exit: Carriage to Town",
      "After the auction, you and the followers you bought arrive at the Riften stables.",
      "出口：馬車で町へ",
      "競売のあと、落札したフォロワーと一緒にリフテンの馬屋の前へ着きます。"),
+)
+
+# Add-ons: mods of their own that others can use. (flag, project, map, English name and text, Japanese
+# name and text, the sample flag that needs it)
+ADDONS = (
+    ("IOULedger", "IOULedger", "ja_map_ledger.json",
+     "Add-on: IOU Ledger",
+     "Debts any mod can give an NPC: a bond in their inventory, the amount on record, and the journal tracking "
+     "up to ten debtors. A mod of its own, not tied to the auction. Needed by the exit Set Free in Debt.",
+     "追加 MOD：借用書台帳",
+     "どの MOD からでも NPC に借金を負わせられる仕組みです。借用書を持たせ、金額を記録し、ジャーナルで最大 10 人まで追跡できます。"
+     "競売とは独立した MOD です。出口「借金を背負って解放」に必要です。",
+     "ExitDebt"),
 )
 
 files = {}
@@ -119,6 +146,10 @@ for flag, project, map_file, *_ in SAMPLES:
     add_project(f"samples/en/{flag}", project)
     add_project(f"samples/ja/{flag}", project)
     japanese_overlay(f"samples/ja/{flag}", project, map_file)
+for flag, project, map_file, *_ in ADDONS:
+    add_project(f"addons/en/{flag}", project)
+    add_project(f"addons/ja/{flag}", project)
+    japanese_overlay(f"addons/ja/{flag}", project, map_file)
 
 
 # --- The installer ---------------------------------------------------------------------------------
@@ -135,8 +166,7 @@ def xml_bytes(root):
     # at line 1, position 39. So the declaration is written by hand.
     ET.indent(root)
     buffer = io.BytesIO()
-    buffer.write(b'<?xml version="1.0" encoding="utf-8"?>
-')
+    buffer.write(b'<?xml version="1.0" encoding="utf-8"?>\n')
     ET.ElementTree(root).write(buffer, encoding="utf-8", xml_declaration=False)
     return buffer.getvalue()
 
@@ -188,6 +218,31 @@ def samples_step(step_name, group_name, flag, name_at, text_at):
 samples_step("Samples", "Samples (none are needed; each is a small mod, source included)", "LangEN", 3, 4)
 samples_step("サンプル", "サンプル（どれも必須ではありません。小さな MOD で、ソース付きです）", "LangJA", 5, 6)
 
+
+def addons_step(step_name, group_name, flag, name_at, text_at):
+    """A step after the samples, so that a sample chosen there makes the add-on it needs required."""
+    step = el(steps, "installStep", name=step_name)
+    visible = el(step, "visible")
+    el(visible, "flagDependency", flag=flag, value="On")
+    groups = el(step, "optionalFileGroups", order="Explicit")
+    group = el(groups, "group", name=group_name, type="SelectAny")
+    plugins = el(group, "plugins", order="Explicit")
+    for addon in ADDONS:
+        p = el(plugins, "plugin", name=addon[name_at])
+        el(p, "description", addon[text_at])
+        conditions = el(p, "conditionFlags")
+        el(conditions, "flag", "On", name=addon[0])
+        types = el(p, "typeDescriptor")
+        dependency = el(types, "dependencyType")
+        el(dependency, "defaultType", name="Optional")
+        needed = el(el(dependency, "patterns"), "pattern")
+        el(el(needed, "dependencies", operator="And"), "flagDependency", flag=addon[7], value="On")
+        el(needed, "type", name="Required")
+
+
+addons_step("Add-ons", "Add-ons (mods of their own that other mods can use)", "LangEN", 3, 4)
+addons_step("追加 MOD", "追加 MOD（ほかの MOD からも使える、独立した MOD です）", "LangJA", 5, 6)
+
 conditional = el(config, "conditionalFileInstalls")
 patterns = el(conditional, "patterns")
 
@@ -206,6 +261,11 @@ pattern(["LangJA"], "core/ja")
 for sample in SAMPLES:
     pattern(["LangEN", sample[0]], f"samples/en/{sample[0]}")
     pattern(["LangJA", sample[0]], f"samples/ja/{sample[0]}")
+for addon in ADDONS:
+    # Installed when chosen, and always with the sample that needs it, whatever the installer showed.
+    for language, code in (("LangEN", "en"), ("LangJA", "ja")):
+        pattern([language, addon[0]], f"addons/{code}/{addon[0]}")
+        pattern([language, addon[7]], f"addons/{code}/{addon[0]}")
 files["fomod/ModuleConfig.xml"] = xml_bytes(config)
 
 # --- Written last: nothing is packed unless all of it was found --------------------------------------

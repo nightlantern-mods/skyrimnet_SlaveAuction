@@ -1,0 +1,23 @@
+FormKey: 000802:IOULedger.esp
+EditorID: IOULedger_BondNote
+ObjectBounds:
+  First: -8, -5, 0
+  Second: 8, 5, 0
+Name:
+  TargetLanguage: English
+  Value: '[IOU] Debt Bond'
+Model:
+  File: Clutter\Books\Note03.nif
+BookText:
+  TargetLanguage: English
+  Value: >-
+    <font face="$HandwrittenFont">I, the bearer of this bond, owe the sum that stands against my name in the ledger, and I will carry this bond until every coin of it is paid.
+PickUpSound: 0C7A54:Skyrim.esm
+Keywords:
+- 000801:IOULedger.esp
+Teaches:
+  MutagenObjectType: BookTeachesNothing
+InventoryArt: 01541C:Skyrim.esm
+Description:
+  TargetLanguage: English
+  Value: ''

@@ -1,0 +1,22 @@
+FormKey: 000800:skyrimnet_SlaveAuction_ExitDebt.esp
+EditorID: skyrimnet_SlaveAuction_ExitDebtQuest
+VirtualMachineAdapter:
+  Scripts:
+  - Name: skyrimnet_SlaveAuction_ExitDebt
+  FileName: ''
+  Aliases:
+  - Property:
+      Name: ''
+      Object: 000800:skyrimnet_SlaveAuction_ExitDebt.esp
+      Alias: 0
+    Scripts:
+    - Name: skyrimnet_SlaveAuction_ExitDebtLoad
+Flags:
+- StartGameEnabled
+Priority: 50
+NextAliasID: 1
+Aliases:
+- Name: Player
+  Flags: []
+  ForcedReference: 000014:Skyrim.esm
+  VoiceTypes: Null

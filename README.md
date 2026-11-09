@@ -1,4 +1,4 @@
-# SkyrimNet Slave Auction 0.1.1
+# SkyrimNet Slave Auction 0.2.0
 
 A secret slave auction in a stone basement near Riften. Get sold on its stage, or sit among the
 buyers and bid for your own followers. SkyrimNet gives everyone a voice: the staff, the twelve
@@ -13,8 +13,8 @@ an exit mod is one JSON file and a marker in your own plugin.
 
 **Version 0.1.0 changed SkyrimNet's settings for other mods.** On every auction it rewrote the cooldowns of some actions that other mods add to SkyrimNet (restraints, kidnapping, fights, dressing and more: up to 39 actions, only those of mods you have installed), and SkyrimNet saved them in its `Actions.yaml`. Those mods then behave differently, even outside the auction.
 
-- **You ran an auction with 0.1.0:** update to 0.1.1, then run the separate download **SkyrimNet Actions Repair** once, with the game closed. Its README says how.
-- **You start with 0.1.1 or later, or never ran an auction with 0.1.0:** you do not need the repair. 0.1.1 never touches SkyrimNet's settings.
+- **You ran an auction with 0.1.0:** update to this version, then run the separate download **SkyrimNet Actions Repair** once, with the game closed. Its README says how. If you already ran it after updating to 0.1.1, you do not need it again.
+- **You started with 0.1.1 or later, or never ran an auction with 0.1.0:** you do not need the repair. Since 0.1.1 the mod never touches SkyrimNet's settings.
 
 ## Requirements
 
@@ -59,8 +59,8 @@ The map shows **Underground Auction Hall**, near Riften. The receptionist is in 
 
 | Sold to | What happens |
 |---|---|
-| You | You pay the price and they follow you again. |
-| Another buyer | You get half the price, if you offered them yourself. They can be bought back from the receptionist at 1.5 times the price. |
+| You | You pay the price and they follow you again, right after the sale. |
+| Another buyer | You get half the price, if you offered them yourself. They can be bought back from the receptionist at 1.5 times the price, as soon as they are sold. |
 
 If followers are taken while you are elsewhere, they wait in the cage for three in-game days, and
 then are sold without you. Starting a fight in the hall stops the auction: your followers go free and
@@ -74,14 +74,17 @@ Exit definitions that could not be loaded are listed there too, with the reason.
 
 ## Samples
 
-Four small working examples, offered by the installer. They come with their source.
+Small working examples, offered by the installer, and one add-on. They come with their source.
 
 | Sample | What it does |
 |---|---|
 | Entry: Defeated in Battle | Beaten by humanoid enemies, you are sold instead of dying. It has an optional give-up key. Do not use it with another defeat mod. |
 | Entry: Abducted in Sleep | When you sleep outdoors, in an inn or in a dungeon, your followers may be carried off (25% by default). |
 | Exit: The Mine | Sold, you work a mine to get out. Followers sold to another buyer can be bought back there. |
+| Entry: Sacked Captives | Needs Diary of Mine. Carry someone to the receptionist's room in a sack, take them out tied up, and hand them over to be sold. You get half of what another buyer pays. |
 | Exit: Carriage to Town | After the auction, you and the followers you bought arrive at the Riften stables. |
+| Exit: Set Free in Debt | A moneylender takes a seat and wins every lot you do not buy, then sets each free at once, owing three times the price. Followers come back to you; others go home. Needs the IOU Ledger. |
+| Add-on: IOU Ledger | Debts any mod can give an NPC. The debtor carries a bond, and the journal tracks up to ten debtors. A mod of its own, not tied to the auction. Installed with the exit above. |
 
 With an exit for a sold player installed, the liberators' ending does not happen. Switch that exit
 off in the MCM to see it again.
@@ -111,10 +114,8 @@ SendModEvent("skyrimnet_SlaveAuction_Capture", "defeated by bandits on the road"
 
 - **Tested with Nether's Follower Framework (NFF) only.** Other setups, including vanilla followers
   with no follower framework, have not been tested.
-- **Vanilla followers can be dismissed while held.** If you buy back such a follower, you may have to
-  ask them to follow you again.
-- **Sold followers stay listed in NFF.** They leave the party but not NFF's own list.
-- **Only followers near you are caught:** within about 60 meters, and at most 10 of them.
+- **Only followers near you are caught:** within about 60 meters, and at most 10 of them, unless
+  another mod names someone for an auction.
 - **A menu pauses the auction,** since SkyrimNet's lines and the scripts wait while one is open.
 - **If the AI does not answer,** the auction goes on without the line. Each missing line takes up to
   20 seconds, so it can look stopped. Look at SkyrimNet's log for a model that has run out or timed
@@ -141,6 +142,9 @@ under their own terms:
 - SkyrimNet: the scripts call its plugin API, which is MIT licensed by Fateless.Ai, and the SkyrimNet
   add-on files follow its formats.
 - ZaZ Animation Pack: when installed, its cross and pose are used by name at run time.
-- Nether's Follower Framework is only named, as what the mod was tested with.
+- Nether's Follower Framework: when installed, the scripts call its functions to let a follower go and to
+  take them back, the way it does itself.
+- Diary of Mine: the sample Entry: Sacked Captives calls its functions to untie and tie up again, and
+  reads its factions, at run time.
 
 To compile the scripts, you need the script sources of those mods.

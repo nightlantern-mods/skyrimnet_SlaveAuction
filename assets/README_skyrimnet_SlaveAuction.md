@@ -8,8 +8,8 @@ This mod is for adult players. It shows captivity and nudity.
 
 **Version 0.1.0 changed SkyrimNet's settings for other mods.** On every auction it rewrote the cooldowns of some actions that other mods add to SkyrimNet (restraints, kidnapping, fights, dressing and more: up to 39 actions, only those of mods you have installed), and SkyrimNet saved them in its `Actions.yaml`. Those mods then behave differently, even outside the auction.
 
-- **You ran an auction with 0.1.0:** update to 0.1.1, then run the separate download **SkyrimNet Actions Repair** once, with the game closed. Its README says how.
-- **You start with 0.1.1 or later, or never ran an auction with 0.1.0:** you do not need the repair. 0.1.1 never touches SkyrimNet's settings.
+- **You ran an auction with 0.1.0:** update to this version, then run the separate download **SkyrimNet Actions Repair** once, with the game closed. Its README says how. If you already ran it after updating to 0.1.1, you do not need it again.
+- **You started with 0.1.1 or later, or never ran an auction with 0.1.0:** you do not need the repair. Since 0.1.1 the mod never touches SkyrimNet's settings.
 
 ## Requirements
 
@@ -43,8 +43,8 @@ The map shows **Underground Auction Hall**, near Riften. The receptionist is in 
 
 | Sold to | What happens |
 |---|---|
-| You | You pay the price and they follow you again. |
-| Another buyer | You get half the price, if you offered them yourself. They can be bought back from the receptionist at 1.5 times the price. |
+| You | You pay the price and they follow you again, right after the sale. |
+| Another buyer | You get half the price, if you offered them yourself. They can be bought back from the receptionist at 1.5 times the price, as soon as they are sold. |
 
 If followers are taken while you are elsewhere, they wait in the cage for three in-game days, and then are sold without you. Starting a fight in the hall stops the auction: your followers are set free and the buyers run.
 
@@ -62,8 +62,11 @@ If followers are taken while you are elsewhere, they wait in the cage for three 
 |---|---|
 | Entry: Defeated in Battle | Beaten by humanoid enemies, you are sold instead of dying. Do not use it with another defeat mod. |
 | Entry: Abducted in Sleep | When you sleep outdoors, in an inn or in a dungeon, your followers may be carried off (25% by default). |
+| Entry: Sacked Captives | Needs Diary of Mine. Carry someone to the receptionist's room in a sack, take them out tied up, and hand them over to be sold. You get half of what another buyer pays. |
 | Exit: The Mine | Sold, you work a mine to get out. Followers sold to another buyer can be bought back there, at 1.5 times the price. |
 | Exit: Carriage to Town | After the auction, you and the followers you bought arrive at the Riften stables. |
+| Exit: Set Free in Debt | A moneylender takes a seat and wins every lot you do not buy, then sets each free at once, owing three times the price. Followers come back to you; others go home. Needs the IOU Ledger. |
+| Add-on: IOU Ledger | Debts any mod can give an NPC. The debtor carries a bond, and the journal tracks up to ten debtors. Installed with the exit above. |
 
 With an exit for a sold player installed, the liberators' ending does not happen. To see it again, switch those exits off in the MCM.
 
@@ -72,7 +75,7 @@ With an exit for a sold player installed, the liberators' ending does not happen
 - **Tested with Nether's Follower Framework (NFF) only.** Other setups, including vanilla followers with no follower framework, have not been tested.
 - **Vanilla followers can be dismissed while held.** Followers caught without the player are set to wait (`WaitingForPlayer` = 1), so that follower frameworks do not warp them back to the player. In the vanilla game, a waiting follower is dismissed after three in-game days away from the player. If you buy back such a follower later, you may have to ask them to follow you again.
 - **Sold followers stay listed in NFF.** A follower sold to another buyer leaves the party but is not removed from NFF's own list.
-- **Only followers near the player are caught,** within about 60 meters, and at most 10 of them. Anyone else stays free.
+- **Only followers near the player are caught,** within about 60 meters, and at most 10 of them. Anyone else stays free, unless another mod names them for an auction.
 - **A menu pauses the auction.** While a menu is open, SkyrimNet's lines and the scripts wait.
 - **When the AI does not answer,** the auction goes on without the line. Each missing line takes up to 20 seconds, so it can look stopped. If it does, look at SkyrimNet's log for a model that has run out or timed out.
 - **The AI can get an amount wrong.** The spoken figure now and then differs from the real bid. The notification shows the right one.

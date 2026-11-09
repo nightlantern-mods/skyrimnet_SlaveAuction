@@ -20,6 +20,9 @@
     "guestClosed": "The auction is over.",
     "soldOffScreen": "You came too late: your followers have been sold.",
     "brawl": "The auction breaks up in panic.",
-    "bidRaised": "You raise your hand"
+    "bidRaised": "You raise your hand",
+    "lotsTaken": "The captives are in the cage at the auction hall. Its door is open to you.",
+    "lotsTooLate": "You came too late: the captives have been sold.",
+    "lotSentOn": "Sent on ahead"
   }
 }

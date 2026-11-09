@@ -1,0 +1,25 @@
+{
+  "id": "local.iou-ledger",
+  "type": "bundle",
+  "title": "IOU Ledger",
+  "tagline": "Debts any mod can give an NPC.",
+  "description": "Tells the AI what the debt bond of IOULedger.esp is.",
+  "author": "nightlantern-mods",
+  "tags": [
+    "prompts"
+  ],
+  "nsfw": false,
+  "icon": "sparkles",
+  "mods": [
+    {
+      "name": "IOU Ledger",
+      "file": "IOULedger.esp",
+      "required": true
+    }
+  ],
+  "languages": [
+    "en"
+  ],
+  "version": "0.1.0",
+  "min_skyrimnet_version": "0.25.0"
+}

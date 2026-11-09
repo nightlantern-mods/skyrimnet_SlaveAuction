@@ -1,0 +1,25 @@
+{
+  "id": "local.skyrimnet-slaveauction-entrysack",
+  "type": "bundle",
+  "title": "SkyrimNet Slave Auction: Sacked Captives",
+  "tagline": "Sample entry for the slave auction.",
+  "description": "Keeps the AI from firing the player's own choice in skyrimnet_SlaveAuction_EntrySack.esp.",
+  "author": "nightlantern-mods",
+  "tags": [
+    "prompts"
+  ],
+  "nsfw": true,
+  "icon": "sparkles",
+  "mods": [
+    {
+      "name": "SkyrimNet Slave Auction: Sacked Captives",
+      "file": "skyrimnet_SlaveAuction_EntrySack.esp",
+      "required": true
+    }
+  ],
+  "languages": [
+    "en"
+  ],
+  "version": "0.1.0",
+  "min_skyrimnet_version": "0.25.0"
+}

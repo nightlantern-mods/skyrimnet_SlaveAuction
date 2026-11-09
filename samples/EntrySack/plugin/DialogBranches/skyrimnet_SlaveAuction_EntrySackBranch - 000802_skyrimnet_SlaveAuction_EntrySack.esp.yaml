@@ -1,0 +1,7 @@
+FormKey: 000802:skyrimnet_SlaveAuction_EntrySack.esp
+EditorID: skyrimnet_SlaveAuction_EntrySackBranch
+Quest: 000800:skyrimnet_SlaveAuction_EntrySack.esp
+Category: Player
+Flags:
+- TopLevel
+StartingTopic: 000803:skyrimnet_SlaveAuction_EntrySack.esp

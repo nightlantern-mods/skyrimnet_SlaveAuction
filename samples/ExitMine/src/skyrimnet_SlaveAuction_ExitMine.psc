@@ -258,7 +258,23 @@ Function Strip(Actor follower)
 	StorageUtil.SetFormValue(follower, OutfitKey, follower.GetActorBase().GetOutfit())
 	follower.SetOutfit(Game.GetFormFromFile(BareOutfitID, PluginName) as Outfit)
 	follower.UnequipAll()
-	follower.RemoveAllItems(ChestAt(slot), False, False)
+	; RemoveAllItems right after an outfit change once hung the game: see the auction's TakeBelongings.
+	Utility.Wait(0.25)
+	MoveItems(follower, ChestAt(slot))
+EndFunction
+
+Function MoveItems(ObjectReference from, ObjectReference to)
+	Int i = from.GetNumItems()
+	While i > 0
+		i -= 1
+		Form item = from.GetNthForm(i)
+		If item && item.IsPlayable()
+			Int count = from.GetItemCount(item)
+			If count > 0
+				from.RemoveItem(item, count, True, to)
+			EndIf
+		EndIf
+	EndWhile
 EndFunction
 
 Function GiveBack(Actor follower)
@@ -266,7 +282,7 @@ Function GiveBack(Actor follower)
 	If slot < 0
 		Return
 	EndIf
-	ChestAt(slot).RemoveAllItems(follower, False, True)
+	MoveItems(ChestAt(slot), follower)
 	Outfit worn = StorageUtil.GetFormValue(follower, OutfitKey) as Outfit
 	If worn
 		follower.SetOutfit(worn)
@@ -282,14 +298,29 @@ Function Hold(Actor follower)
 	follower.EvaluatePackage()
 EndFunction
 
-; WaitingForPlayer: a follower framework warps a far follower back unless it is 1, so the auction left it so.
+; A follower sold here was let go by the auction; one sold with the player is still in their slot.
+; Either way the auction's ReturnFollower gives them back.
 Function Release(Actor follower)
 	If follower
 		GiveBack(follower)
 		ActorUtil.RemovePackageOverride(follower, Game.GetFormFromFile(DoNothingID, "Skyrim.esm") as Package)
-		follower.SetActorValue("WaitingForPlayer", 0.0)
-		follower.AddToFaction(Game.GetForm(CurrentFollowerFactionID) as Faction)
-		follower.SetPlayerTeammate(True)
+		; Someone an entry mod named, who never followed the player, goes back to their own life. The
+		; mine's navmesh does not reach the outside, so they cannot walk there.
+		If StorageUtil.GetIntValue(follower, "skyrimnet_SlaveAuction_NotFollower") == 1
+			Cell mine = Ref(OverseerMarkerID).GetParentCell()
+			follower.EvaluatePackage()
+			follower.MoveToPackageLocation()
+			If !mine || follower.GetParentCell() == mine
+				follower.MoveToMyEditorLocation()
+			EndIf
+		Else
+			; The auction hires them again the way their follower framework does, vanilla's or NFF's.
+			Int handle = ModEvent.Create("skyrimnet_SlaveAuction_ReturnFollower")
+			If handle
+				ModEvent.PushForm(handle, follower)
+				ModEvent.Send(handle)
+			EndIf
+		EndIf
 		follower.EvaluatePackage()
 	EndIf
 EndFunction

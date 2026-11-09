@@ -37,6 +37,21 @@ Int Property DefaultExitWeight = 10 AutoReadOnly
 String Property ExitForPlayerSold = "player_sold" AutoReadOnly
 String Property ExitForFollowersSold = "followers_sold" AutoReadOnly
 String Property ExitForFollowersBought = "followers_bought" AutoReadOnly
+; Only used when a request names it: never chosen by weight, and the player does not move.
+String Property ExitForLotsBought = "lots_bought" AutoReadOnly
+; What mods can check before asking for what an older version does not have.
+String Property ApiLevelKey = "skyrimnet_SlaveAuction_ApiLevel" AutoReadOnly
+Int Property ApiLevel = 2 AutoReadOnly
+; A request for named lots, kept on the form that sends the capture event. Emptied by every answer.
+String Property RequestedLotsKey = "skyrimnet_SlaveAuction_RequestedLots" AutoReadOnly
+String Property RequestedExitKey = "skyrimnet_SlaveAuction_RequestedExit" AutoReadOnly
+String Property KeepLostLotsKey = "skyrimnet_SlaveAuction_KeepLostLots" AutoReadOnly
+; On the lot. 1 for someone who was not following the player when caught; no value means a follower,
+; as for everyone still waiting to be bought back in a save from before this was kept.
+String Property NotFollowerKey = "skyrimnet_SlaveAuction_NotFollower" AutoReadOnly
+String Property LotExitKey = "skyrimnet_SlaveAuction_LotExit" AutoReadOnly   ; where a lot waiting to be bought back goes then
+String Property GoHomeKey = "skyrimnet_SlaveAuction_GoHome" AutoReadOnly   ; released here, who go home when the player leaves
+Int Property OutsideMarkerID = 0x82D AutoReadOnly
 String Property SoldCaptivesKey = "skyrimnet_SlaveAuction_SoldCaptives" AutoReadOnly
 String Property BoughtCaptivesKey = "skyrimnet_SlaveAuction_BoughtCaptives" AutoReadOnly
 String Property WaitingValue = "WaitingForPlayer" AutoReadOnly   ; follower frameworks do not warp one who waits
@@ -111,6 +126,11 @@ Float Property StageEntryOffsetX = -90.0 AutoReadOnly
 Int Property DoNothingID = 0x0654E2 AutoReadOnly
 Int Property CurrentFollowerFactionID = 0x05C84E AutoReadOnly
 Int Property CurrentHirelingFactionID = 0x0BD738 AutoReadOnly
+Int Property DialogueFollowerID = 0x0750BA AutoReadOnly   ; the follower quest: vanilla's slot, and NFF's slots too
+String Property NffPlugin = "nwsFollowerFramework.esp" AutoReadOnly
+Int Property NffQuestID = 0x434F AutoReadOnly
+Int Property NffSpeakerAlias = 2 AutoReadOnly             ; whom NFF's DismissFollower acts on
+String Property ReturnFollowerEvent = "skyrimnet_SlaveAuction_ReturnFollower" AutoReadOnly
 ; Bound hands, as for the prisoners at Helgen (WEPrisonerAliasScript, MQ101).
 Int Property BareOutfitID = 0x829 AutoReadOnly
 Int Property PlayerAliasID = 0 AutoReadOnly
@@ -146,6 +166,8 @@ String pendingAction
 Int outsideDoorTries
 String captureReason
 String chosenExit
+Bool exitPending                    ; an auction without the player chooses at its first lot: the MCM counts until then
+Bool liberating                     ; the liberators' fight, which the hall's fight watch must leave alone
 Bool exitAcked
 Bool playerIsGuest                  ; only followers were caught
 Int firstCaptive                    ; 1 then: captives[0] is the player and is not held
@@ -158,6 +180,15 @@ Bool bidRefused                     ; told once why a press did nothing: notific
 Int currentPrice
 Actor currentLeader
 Bool auctionAborted
+Form auctionRequester               ; who asked for this auction, None for the receptionist
+Bool lotsNamed                      ; the request named who is caught, in namedLots
+Actor[] namedLots
+String lotsExit                     ; the file of the lots_bought exit the request named
+Bool keepLostLots                   ; those another buyer wins wait for the receptionist, whatever exits there are
+Bool quietCapture                   ; no fade and no word from the auction: the requester shows what it wants
+Bool[] delivered                    ; sold and sent on, so the auction no longer holds them
+Bool boughtExitPicked               ; the followers_bought exit is chosen once, at the first follower won
+String boughtExit
 
 Event OnInit()
 	Setup()
@@ -174,8 +205,10 @@ EndFunction
 
 ; Called again by the player alias on every save load: mod-event registrations do not survive one.
 Function Setup()
+	StorageUtil.SetIntValue(None, ApiLevelKey, ApiLevel)
 	RegisterForModEvent("skyrimnet_SlaveAuction_Capture", "OnCaptureRequested")
 	RegisterForModEvent("skyrimnet_SlaveAuction_ExitAck", "OnExitAck")
+	RegisterForModEvent(ReturnFollowerEvent, "OnReturnFollower")
 	RegisterForModEvent("SkyrimNet_AudioStarted", "OnSkyrimNetAudioStarted")
 	RegisterForModEvent("SkyrimNet_AudioEnded", "OnSkyrimNetAudioEnded")
 	Ref(OutsideDoorID).BlockActivation(False)   ; saves from when the script moved the player out
@@ -193,6 +226,9 @@ Function Setup()
 		SetActionsBlocked(True)
 	EndIf
 	WatchBoundCaptives()
+	If !IsInHall(Game.GetPlayer())   ; the door's event does not come if the player left by another way
+		SendThemHome()
+	EndIf
 EndFunction
 
 ; A save keeps where an alias's reference stood when it first met it, even after the plugin has moved it.
@@ -259,24 +295,144 @@ EndEvent
 ; tells SkyrimNet how they came here. The answer goes out as skyrimnet_SlaveAuction_CaptureResult:
 ; Event OnCaptureResult(String result, String reason, Form requester), result "accepted", "busy" or
 ; "no_captives". A number of 1.0 after the text catches only the followers, and the player comes to bid.
+; 2.0 catches only the NPCs the sender listed in RequestedLotsKey, wherever they are, and the player
+; comes to bid. The sender can also name a lots_bought exit and keep those another buyer wins here.
+; 3.0 is the same with no fade, and adds to the auction already waiting for its first or next lot;
+; only the auction's first request says where its lots go. A cage already full answers "full".
 Event OnCaptureRequested(String eventName, String strArg, Float numArg, Form sender)
-	If busy || IsHoldingCaptives()
-		SendCaptureResult("busy", strArg, sender)
+	Bool adding = numArg == 3.0
+	Bool named = numArg == 2.0 || adding
+	; Set straight after the check, with no call between: two requests must not both get through.
+	If busy
+		RefuseCapture("busy", strArg, sender, named)
 		Return
 	EndIf
-	Bool withoutPlayer = numArg == 1.0
-	If withoutPlayer && NearbyFollowerCount() == 0
+	busy = True
+	If adding && CanAddLots()
+		String added = AddRequestedLots(sender)
+		busy = False
+		SendCaptureResult(added, strArg, sender)
+		Return
+	EndIf
+	If IsHoldingCaptives()
+		busy = False
+		RefuseCapture("busy", strArg, sender, named)
+		Return
+	EndIf
+	Bool withoutPlayer = named || numArg == 1.0
+	ForgetRequest()
+	If named
+		ReadRequest(sender)
+	EndIf
+	If (named && !namedLots[0]) || (numArg == 1.0 && NearbyFollowerCount() == 0)
+		busy = False
 		SendCaptureResult("no_captives", strArg, sender)
 		Return
 	EndIf
+	; Before the answer: a sender waiting for its NPC in the list must not find the last auction's.
+	ClearPublicLists()
 	SendCaptureResult("accepted", strArg, sender)
+	auctionRequester = sender
+	quietCapture = adding
 	consigned = False
 	captureReason = strArg
 	If StringUtil.GetLength(captureReason) > CaptureReasonMaxLength
 		captureReason = StringUtil.Substring(captureReason, 0, CaptureReasonMaxLength)
 	EndIf
-	Capture(False, withoutPlayer)
+	RunCapture(False, withoutPlayer)
 EndEvent
+
+Function RefuseCapture(String result, String reason, Form sender, Bool named)
+	If named
+		EmptyRequest(sender)
+	EndIf
+	SendCaptureResult(result, reason, sender)
+EndFunction
+
+; Takes in the sender's request: at most MaxFollowers lots, without the ones who may not be sold.
+Function ReadRequest(Form sender)
+	lotsNamed = True
+	namedLots = new Actor[10]
+	Actor player = Game.GetPlayer()
+	Int count = StorageUtil.FormListCount(sender, RequestedLotsKey)
+	Int n = 0
+	Int i = 0
+	While i < count && n < MaxFollowers
+		Actor npc = StorageUtil.FormListGet(sender, RequestedLotsKey, i) as Actor
+		If IsSellable(npc, player) && namedLots.Find(npc) < 0
+			namedLots[n] = npc
+			n += 1
+		EndIf
+		i += 1
+	EndWhile
+	keepLostLots = StorageUtil.GetIntValue(sender, KeepLostLotsKey) == 1
+	lotsExit = FindLotExit(StorageUtil.GetStringValue(sender, RequestedExitKey))
+	EmptyRequest(sender)
+EndFunction
+
+Function EmptyRequest(Form sender)
+	StorageUtil.FormListClear(sender, RequestedLotsKey)
+	StorageUtil.UnsetStringValue(sender, RequestedExitKey)
+	StorageUtil.UnsetIntValue(sender, KeepLostLotsKey)
+EndFunction
+
+Function ForgetRequest()
+	auctionRequester = None
+	lotsNamed = False
+	lotsExit = ""
+	keepLostLots = False
+	quietCapture = False
+	boughtExitPicked = False
+	boughtExit = ""
+EndFunction
+
+; An auction without the player, with nobody on the stage.
+Bool Function CanAddLots()
+	Return playerIsGuest && !auctionAborted && AuctionState() == StateCaged
+EndFunction
+
+; Into the cage of the waiting auction, one by one. Returns the answer to the request.
+String Function AddRequestedLots(Form sender)
+	Actor player = Game.GetPlayer()
+	Int count = StorageUtil.FormListCount(sender, RequestedLotsKey)
+	Int added = 0
+	Bool full = False
+	Int i = 0
+	While i < count
+		Actor npc = StorageUtil.FormListGet(sender, RequestedLotsKey, i) as Actor
+		If IsSellable(npc, player) && captives.Find(npc) < 0
+			If captiveCount > MaxFollowers
+				full = True
+			Else
+				Int slot = captiveCount
+				captives[slot] = npc
+				HoldCaptive(slot, True)
+				captiveCount = slot + 1
+				StorageUtil.FormListAdd(None, CaptivesListKey, npc)
+				BindLot(npc, IsInHall(player))
+				PlayBoundIdle(npc)
+				added += 1
+			EndIf
+		EndIf
+		i += 1
+	EndWhile
+	EmptyRequest(sender)
+	If added == 0
+		If full
+			Return "full"
+		EndIf
+		Return "no_captives"
+	EndIf
+	; The player's time runs from the last one added.
+	StartGuestClock()
+	SetActionsBlocked(True)
+	Debug.Trace("skyrimnet_SlaveAuction: now in the cage: " + CaptiveNames())
+	Return "accepted"
+EndFunction
+
+Function StartGuestClock()
+	RegisterForSingleUpdateGameTime(24.0 * JsonUtil.GetIntValue(SettingsFile, "guestDays", DefaultGuestDays))
+EndFunction
 
 Function SendCaptureResult(String result, String reason, Form requester)
 	Debug.Trace("skyrimnet_SlaveAuction: capture " + result + " for " + requester + ": " + reason)
@@ -294,59 +450,58 @@ EndFunction
 ; ---------------------------------------------------------------------------------------------
 
 Function Capture(Bool drugged, Bool withoutPlayer)
-	If busy || IsHoldingCaptives()
+	If busy
 		Return
 	EndIf
 	busy = True
+	If IsHoldingCaptives()
+		busy = False
+		Return
+	EndIf
+	ForgetRequest()
+	ClearPublicLists()
+	RunCapture(drugged, withoutPlayer)
+EndFunction
+
+; The lists other mods read, emptied when a new auction is taken on.
+Function ClearPublicLists()
+	StorageUtil.FormListClear(None, CaptivesListKey)
+	StorageUtil.FormListClear(None, SoldCaptivesKey)
+	StorageUtil.FormListClear(None, BoughtCaptivesKey)
+EndFunction
+
+; busy is already set.
+Function RunCapture(Bool drugged, Bool withoutPlayer)
 	Actor player = Game.GetPlayer()
 	If drugged
 		captureReason = ""
 		Debug.Notification(Phrase("drinkDizzy", "The drink burns... the room starts to spin."))
 		Utility.Wait(2.5)
 	EndIf
-	FadeOut()
+	If !quietCapture
+		FadeOut()
+	EndIf
 	; The last auction is cleared away here, whatever its ending, and an exit may have borrowed a buyer.
 	ResetHall()
 	playerIsGuest = withoutPlayer
 	firstCaptive = withoutPlayer as Int
 	auctionAborted = False
+	liberating = False
+	exitPending = False
+	chosenExit = ""
 	If withoutPlayer
-		ChooseExit(ExitForFollowersSold)
+		exitPending = !keepLostLots
 	Else
 		consigned = False
-		ChooseExit(ExitForPlayerSold)
+		If !keepLostLots
+			ChooseExit(ExitForPlayerSold)
+		EndIf
 	EndIf
 	SetUpTwelfthSeat()
 	GatherCaptives(player)
-	Faction captiveFaction = Own(CaptiveFactionID) as Faction
-	Package doNothing = Game.GetFormFromFile(DoNothingID, "Skyrim.esm") as Package
-	ObjectReference cage = Ref(CageMarkerID)
 	Int i = firstCaptive
 	While i < captiveCount
-		Actor captive = captives[i]
-		If captive != player
-			savedOutfits[i] = captive.GetActorBase().GetOutfit()
-			captive.SetOutfit(Own(BareOutfitID) as Outfit)
-		EndIf
-		captive.UnequipAll()
-		captive.RemoveAllItems(ChestFor(i), False, False)
-		captive.AddToFaction(captiveFaction)
-		captive.SetFactionRank(captiveFaction, 1)
-		captive.StopCombat()
-		captive.StopCombatAlarm()
-		If captive.IsBleedingOut()   ; an entry mod's defeat
-			captive.ResetHealthAndLimbs()
-		EndIf
-		If captive != player
-			ActorUtil.AddPackageOverride(captive, doNothing, 100)
-			captive.EvaluatePackage()
-		EndIf
-		If withoutPlayer
-			; Or a follower framework (NFF's catch-up) brings them straight back to the player.
-			captive.SetActorValue(WaitingValue, 1.0)
-			LeaveParty(captive)
-		EndIf
-		captive.MoveTo(cage, CageOffsetX(i), CageOffsetY(i), 0.0)
+		HoldCaptive(i, withoutPlayer)
 		i += 1
 	EndWhile
 	ObjectReference cageDoor = Ref(CageDoorID)
@@ -360,25 +515,98 @@ Function Capture(Bool drugged, Bool withoutPlayer)
 	PlaceRestraint()
 	BindCaptives()
 	SetActionsBlocked(True)
-	Utility.Wait(1.0)
-	FadeIn()
+	If !quietCapture
+		Utility.Wait(1.0)
+		FadeIn()
+	EndIf
 	If withoutPlayer
 		Ref(HallDoorID).Lock(False)
-		RegisterForSingleUpdateGameTime(24.0 * JsonUtil.GetIntValue(SettingsFile, "guestDays", DefaultGuestDays))
-		Debug.Notification(Phrase("followersTaken", "Your followers are in the cage below. The hall door is open to you."))
+		StartGuestClock()
+		If quietCapture
+			; The requester's to show.
+		ElseIf lotsNamed
+			Debug.Notification(Phrase("lotsTaken", "The captives are in the cage at the auction hall. Its door is open to you."))
+		Else
+			Debug.Notification(Phrase("followersTaken", "Your followers are in the cage below. The hall door is open to you."))
+		EndIf
 	Else
 		Debug.Notification(Phrase("wakeInCage", "You wake up naked, locked in a cage."))
+	EndIf
+	If withoutPlayer && !IsInHall(player)
+		busy = False   ; nobody to speak to: a request adding to the cage need not wait
+		Return
 	EndIf
 	; Bound captives set off other mods' narrations, and a directed line waiting behind them expires.
 	WaitForQuiet()
 	busy = False
-	If withoutPlayer && !IsInHall(player)
-		Return
-	EndIf
 	Actor guard = Ref(GuardID) as Actor
 	SkyrimNetApi.DirectNarration(guard.GetDisplayName() + " looks over the new captives in the cage: " + CaptiveNames() \
 		+ ". " + HowTheyCame(drugged) + " They were stripped of everything they owned, and tonight they will be auctioned off one by one. " \
 		+ guard.GetDisplayName() + " mocks them through the bars.", guard, player)
+EndFunction
+
+; Slot i of the captives: stripped, in the auction's faction, held still and moved into the cage.
+Function HoldCaptive(Int i, Bool withoutPlayer)
+	Actor captive = captives[i]
+	Actor player = Game.GetPlayer()
+	Faction captiveFaction = Own(CaptiveFactionID) as Faction
+	If captive != player
+		RemoveFromBuyback(captive)   ; a request can name someone still waiting to be bought back
+		StorageUtil.FormListRemove(None, GoHomeKey, captive, True)   ; or someone just let go
+		savedOutfits[i] = captive.GetActorBase().GetOutfit()
+		captive.SetOutfit(Own(BareOutfitID) as Outfit)
+	EndIf
+	captive.UnequipAll()
+	If captive == player
+		captive.RemoveAllItems(ChestFor(i), False, False)
+	Else
+		TakeBelongings(captive, ChestFor(i))
+	EndIf
+	captive.AddToFaction(captiveFaction)
+	captive.SetFactionRank(captiveFaction, 1)
+	captive.StopCombat()
+	captive.StopCombatAlarm()
+	If captive.IsBleedingOut()   ; an entry mod's defeat
+		captive.ResetHealthAndLimbs()
+	EndIf
+	If captive != player
+		ActorUtil.AddPackageOverride(captive, Game.GetFormFromFile(DoNothingID, "Skyrim.esm") as Package, 100)
+		captive.EvaluatePackage()
+		If captive.IsPlayerTeammate()
+			StorageUtil.UnsetIntValue(captive, NotFollowerKey)
+			If withoutPlayer
+				; Or a follower framework (NFF's catch-up) brings them straight back to the player.
+				captive.SetActorValue(WaitingValue, 1.0)
+				LeaveParty(captive)
+			EndIf
+		Else
+			StorageUtil.SetIntValue(captive, NotFollowerKey, 1)
+		EndIf
+	EndIf
+	captive.MoveTo(Ref(CageMarkerID), CageOffsetX(i), CageOffsetY(i), 0.0)
+EndFunction
+
+; RemoveAllItems right after an outfit change once hung the whole game: it never came out of one NPC's
+; inventory, whose outfit came from another mod. So the engine is given a moment to finish with the
+; outfit, and each thing is moved by itself.
+Function TakeBelongings(Actor captive, ObjectReference chest)
+	Utility.Wait(0.25)
+	MoveItems(captive, chest)
+EndFunction
+
+; Items that cannot be played, such as the tokens other mods keep on an actor, stay where they are.
+Function MoveItems(ObjectReference from, ObjectReference to)
+	Int i = from.GetNumItems()
+	While i > 0
+		i -= 1
+		Form item = from.GetNthForm(i)
+		If item && item.IsPlayable()
+			Int count = from.GetItemCount(item)
+			If count > 0
+				from.RemoveItem(item, count, True, to)
+			EndIf
+		EndIf
+	EndWhile
 EndFunction
 
 String Function HowTheyCame(Bool drugged)
@@ -397,12 +625,7 @@ EndFunction
 Function BindCaptives()
 	Int i = firstCaptive
 	While i < captiveCount
-		Armor cuffs = CuffsFor(captives[i])
-		captives[i].AddItem(cuffs, 1, True)
-		captives[i].EquipItem(cuffs, True, True)
-		If !playerIsGuest   ; the player may be far from the hall, and no 3D comes until they enter it
-			WaitFor3D(captives[i])
-		EndIf
+		BindLot(captives[i], !playerIsGuest)   ; the player may be far from the hall, and no 3D comes until they enter it
 		i += 1
 	EndWhile
 	If !playerIsGuest
@@ -412,10 +635,74 @@ Function BindCaptives()
 	WatchBoundCaptives()
 EndFunction
 
-; 0.1.0 set SkyrimNet action cooldowns here. That did not stop an action that had not been used yet
-; (the cooldown runs from a use), and SkyrimNet saved the values to its Actions.yaml, over the player's
-; own settings. So since 0.1.1 nothing is set.
+Function BindLot(Actor lot, Bool waitFor3DFirst)
+	Armor cuffs = CuffsFor(lot)
+	lot.AddItem(cuffs, 1, True)
+	lot.EquipItem(cuffs, True, True)
+	If waitFor3DFirst
+		WaitFor3D(lot)
+	EndIf
+EndFunction
+
+; Once set SkyrimNet action cooldowns here. That does not stop an action that has not been used yet
+; (the cooldown runs from a use), and SkyrimNet saves it to its Actions.yaml, over the player's own
+; settings. So nothing is set any more; KeepCaptivesBound stops the fights an action can start.
 Function SetActionsBlocked(Bool blocked)
+EndFunction
+
+; A SkyrimNet action can make anyone in the hall attack anyone: a lot on the cross, a buyer, a follower
+; who came along. Not while the player is a guest who drew steel: that is the brawl.
+Function StopHallFights(Int current)
+	If liberating
+		Return
+	EndIf
+	Bool fought = False
+	Int i = 0
+	While i < 3   ; receptionist, guard, auctioneer
+		fought = StopFighting(Ref(ReceptionistID + i) as Actor, True) || fought
+		i += 1
+	EndWhile
+	i = 0
+	While i < BuyerCount
+		fought = StopFighting(Ref(BuyerID + i) as Actor, True) || fought
+		i += 1
+	EndWhile
+	fought = StopFighting(designatedBuyer, True) || fought
+	Actor player = Game.GetPlayer()
+	If current == StateOnStage && currentLot && currentLot != player && StopFighting(currentLot, False)
+		fought = True
+		If CrossIsOurs() && currentLot.GetSitState() != SitStateSitting
+			restraint.Activate(currentLot)   ; back onto the cross
+		EndIf
+	EndIf
+	If !fought
+		Return
+	EndIf
+	Actor[] nearby = MiscUtil.ScanCellNPCs(player, 8192.0)
+	i = 0
+	While i < nearby.Length
+		Actor npc = nearby[i]
+		If npc && npc != player && npc.IsPlayerTeammate() && IsInHall(npc)
+			StopFighting(npc, True)
+		EndIf
+		i += 1
+	EndWhile
+	Debug.Trace("skyrimnet_SlaveAuction: stopped a fight in the hall")
+EndFunction
+
+; A guest's own fight is left alone: whoever fights the guest was most likely struck by them first,
+; and the player's combat ends the auction as a brawl within the second. A lot is always stopped: a
+; captive's attack is never the player's doing.
+Bool Function StopFighting(Actor who, Bool spareGuestFight)
+	If !who || !who.IsInCombat()
+		Return False
+	EndIf
+	If spareGuestFight && playerIsGuest && who.GetCombatTarget() == Game.GetPlayer()
+		Return False
+	EndIf
+	who.StopCombat()
+	who.StopCombatAlarm()
+	Return True
 EndFunction
 
 Function WatchBoundCaptives()
@@ -439,14 +726,11 @@ Bool Function KeepCaptivesBound()
 	If current == StateCaged && !playerIsGuest && Game.IsFightingControlsEnabled()
 		Game.DisablePlayerControls(False, True, False, False, False, False, False, False)
 	EndIf
-	Actor guard = Ref(GuardID) as Actor
-	If guard.IsInCombat()
-		guard.StopCombat()
-	EndIf
+	StopHallFights(current)
 	Int i = firstCaptive
 	While i < captiveCount
 		Actor captive = captives[i]
-		If playerIsGuest && captive && !(current == StateOnStage && captive == currentLot) && !IsInHall(captive)
+		If playerIsGuest && captive && !IsDelivered(i) && !(current == StateOnStage && captive == currentLot) && !IsInHall(captive)
 			ReturnToHold(i)   ; a framework that does not let go of a follower
 		EndIf
 		If captive && !isSold[i] && !(current == StateOnStage && captive == currentLot)
@@ -517,6 +801,7 @@ Function GatherCaptives(Actor player)
 	soldTo = new Actor[11]
 	soldFor = new Int[11]
 	isSold = new Bool[11]
+	delivered = new Bool[11]
 	captives[0] = player
 	captiveCount = 1
 	Actor[] nearby = MiscUtil.ScanCellNPCs(player, FollowerScanRadius)
@@ -524,6 +809,17 @@ Function GatherCaptives(Actor player)
 	leftBehind = new Actor[64]
 	Int left = 0
 	Package doNothing = Game.GetFormFromFile(DoNothingID, "Skyrim.esm") as Package
+	If lotsNamed
+		; The fade has passed since the request was read.
+		While i < namedLots.Length
+			If IsSellable(namedLots[i], player)
+				captives[captiveCount] = namedLots[i]
+				captiveCount += 1
+			EndIf
+			i += 1
+		EndWhile
+		i = nearby.Length
+	EndIf
 	While i < nearby.Length
 		Actor npc = nearby[i]
 		If IsCatchableFollower(npc, player) && (!onlyOffered || offered.Find(npc) >= 0)
@@ -544,7 +840,7 @@ Function GatherCaptives(Actor player)
 	EndWhile
 	onlyOffered = False
 	Debug.Trace("skyrimnet_SlaveAuction: caught " + CaptiveNames())
-	StorageUtil.FormListClear(None, CaptivesListKey)
+	ClearPublicLists()
 	i = firstCaptive
 	While i < captiveCount
 		StorageUtil.FormListAdd(None, CaptivesListKey, captives[i])
@@ -664,6 +960,7 @@ Function RunLot(Actor lot)
 	Actor audience = Ref(BuyerID + AudienceBuyer) as Actor
 
 	FadeOut()
+	DecideExit()
 	HoldAuctioneerAtPost(auctioneer)
 	If isPlayer
 		Game.DisablePlayerControls(True, True, False, False, True, True, True, True)
@@ -740,7 +1037,9 @@ Function RunLot(Actor lot)
 	EndIf
 	FadeOut()
 	TakeOffStage(lot)
-	lot.MoveTo(Ref(HoldingMarkerID))
+	If !playerIsGuest || !DeliverLot(index)
+		lot.MoveTo(Ref(HoldingMarkerID))
+	EndIf
 	HoldAuctioneerAtPost(auctioneer)
 	Utility.Wait(0.5)
 	FadeIn()
@@ -756,15 +1055,30 @@ EndFunction
 ; place. Placed at the capture, so its 3D has long been loaded when the first lot is called:
 ; nobody can be seated in furniture that has none yet.
 Function PlaceRestraint()
-	If restraint
+	If CrossIsOurs()
 		Return
+	EndIf
+	If restraint
+		Debug.Trace("skyrimnet_SlaveAuction: the cross " + restraint + " is gone, placing another")
+		restraint = None
 	EndIf
 	Form restraintBase = Game.GetFormFromFile(RestraintID, "ZaZAnimationPack.esm")
 	If restraintBase
 		ObjectReference stage = Ref(StageMarkerID)
 		restraint = stage.PlaceAtMe(restraintBase)
 		restraint.SetAngle(0.0, 0.0, stage.GetAngleZ())
+		Debug.Trace("skyrimnet_SlaveAuction: placed the cross " + restraint + ", hall loaded " + stage.Is3DLoaded())
 	EndIf
+EndFunction
+
+; A placed reference's ID is given again once it is deleted. The cross was found deleted by something
+; else, and its ID taken by an actor: so the cross is used, and removed, only while it is still the cross.
+Bool Function CrossIsOurs()
+	If !restraint
+		Return False
+	EndIf
+	Form base = restraint.GetBaseObject()
+	Return base && base == Game.GetFormFromFile(RestraintID, "ZaZAnimationPack.esm") && !restraint.IsDeleted()
 EndFunction
 
 Function WaitFor3D(ObjectReference target)
@@ -1014,6 +1328,15 @@ Bool Function IsCatchableFollower(Actor npc, Actor player)
 	Return npc && npc != player && npc.IsPlayerTeammate() && !npc.IsDead() && !npc.IsChild() && !IsHouseActor(npc)
 EndFunction
 
+; Who a request may name. The checks on the followers around the player apply to anyone it lists.
+Bool Function IsSellable(Actor npc, Actor player)
+	Return npc && npc != player && !npc.IsDead() && !npc.IsDisabled() && !npc.IsChild() && !IsHouseActor(npc)
+EndFunction
+
+Bool Function IsNotFollower(Actor lot)
+	Return StorageUtil.GetIntValue(lot, NotFollowerKey) == 1
+EndFunction
+
 Bool Function IsInHall(Actor who)
 	Return who.GetParentCell() == Ref(CageMarkerID).GetParentCell()
 EndFunction
@@ -1233,13 +1556,92 @@ Bool Function AllSold()
 	Return True
 EndFunction
 
-; Every lot has gone: those another buyer won leave on their own, those the player won are theirs.
+; An auction without the player: a lot goes on as soon as it is sold, in the fade after the sale.
+; Returns False for those who must wait for the close: the player would have to leave with followers
+; they won, and an exit from before each_lot was told it gets everyone at once.
+Bool Function DeliverLot(Int i)
+	Actor lot = captives[i]
+	Actor player = Game.GetPlayer()
+	If soldTo[i] == player
+		If IsUsableLotExit(lotsExit)
+			ObjectReference lotMarker = ExitMarker(lotsExit)
+			String lotEvent = JsonUtil.GetStringValue(lotsExit, "event")
+			JsonUtil.Unload(lotsExit, False)
+			ReleaseFollower(i)
+			LetFollowerGo(lot)   ; the exit's now: it gives them back with ReturnFollower if it wants
+			lot.MoveTo(lotMarker, CageOffsetX(i) * ArrivalSpread, CageOffsetY(i) * ArrivalSpread, 0.0)
+			SendLotEvent(lotEvent, lot, soldFor[i], False)
+		ElseIf IsNotFollower(lot)
+			ReleaseFollower(i)
+			lot.MoveTo(player)
+			LetGo(lot)
+		ElseIf BoughtExitWaits()
+			Return False
+		Else
+			ReleaseFollower(i)
+			RejoinParty(lot)
+			lot.MoveTo(player)
+		EndIf
+	Else
+		ObjectReference soldMarker = None
+		If chosenExit != ""
+			soldMarker = ExitMarker(chosenExit)
+		EndIf
+		If soldMarker && JsonUtil.GetIntValue(chosenExit, "each_lot") != 1
+			JsonUtil.Unload(chosenExit, False)
+			Return False
+		EndIf
+		ReleaseFollower(i)
+		LeaveParty(lot)
+		LetFollowerGo(lot)
+		If soldMarker
+			String soldEvent = JsonUtil.GetStringValue(chosenExit, "event")
+			JsonUtil.Unload(chosenExit, False)
+			lot.MoveTo(soldMarker, CageOffsetX(i) * ArrivalSpread, CageOffsetY(i) * ArrivalSpread, 0.0)
+			SendEachLotEvent(soldEvent, lot, soldTo[i], soldFor[i])
+		Else
+			HoldForBuyback(lot, soldFor[i])
+		EndIf
+	EndIf
+	If delivered.Length == 0   ; an auction under way in a save from before this was kept
+		delivered = new Bool[11]
+	EndIf
+	delivered[i] = True
+	Return True
+EndFunction
+
+Bool Function IsDelivered(Int i)
+	Return i < delivered.Length && delivered[i]
+EndFunction
+
+; chosenExit holds the followers_sold exit until the close.
+Bool Function BoughtExitWaits()
+	If !boughtExitPicked
+		String soldExit = chosenExit
+		ChooseExit(ExitForFollowersBought)
+		boughtExit = chosenExit
+		chosenExit = soldExit
+		boughtExitPicked = True
+	EndIf
+	Return boughtExit != "" && ExitMarker(boughtExit)
+EndFunction
+
+; Every lot has gone: the last of those still held go now, and the auction ends.
 Function CloseGuestAuction()
 	UnregisterForUpdateGameTime()
 	Actor player = Game.GetPlayer()
 	SetAuctionState(StateFreed)
 	SetActionsBlocked(False)
 	Ref(CageDoorID).Lock(False)
+	; Whoever was sold off screen has not gone anywhere yet.
+	Int i = 1
+	While i < captiveCount
+		If !IsDelivered(i)
+			DeliverLot(i)
+		EndIf
+		i += 1
+	EndWhile
+	; All who are left wait for an exit that works at the close.
 	ObjectReference soldMarker = None
 	String soldEvent = ""
 	If chosenExit != ""
@@ -1252,23 +1654,31 @@ Function CloseGuestAuction()
 	Actor lastBuyer = None
 	Int soldTotal = 0
 	Int boughtTotal = 0
-	Int i = 1
+	Int followersWon = 0
+	i = 1
 	While i < captiveCount
-		Actor follower = captives[i]
-		ReleaseFollower(i)
+		Actor lot = captives[i]
 		If soldTo[i] == player
-			RejoinParty(follower)
-			StorageUtil.FormListAdd(None, BoughtCaptivesKey, follower)
-			boughtTotal += soldFor[i]
+			StorageUtil.FormListAdd(None, BoughtCaptivesKey, lot)
+			If !IsDelivered(i)
+				ReleaseFollower(i)
+				RejoinParty(lot)
+				boughtTotal += soldFor[i]
+				followersWon += 1
+			EndIf
 		Else
-			StorageUtil.FormListAdd(None, SoldCaptivesKey, follower)
-			soldTotal += soldFor[i]
-			lastBuyer = soldTo[i]
-			LeaveParty(follower)
-			If soldMarker
-				follower.MoveTo(soldMarker, CageOffsetX(i) * ArrivalSpread, CageOffsetY(i) * ArrivalSpread, 0.0)
-			Else
-				HoldForBuyback(follower, soldFor[i])
+			StorageUtil.FormListAdd(None, SoldCaptivesKey, lot)
+			If !IsDelivered(i)
+				ReleaseFollower(i)
+				LeaveParty(lot)
+				LetFollowerGo(lot)
+				soldTotal += soldFor[i]
+				lastBuyer = soldTo[i]
+				If soldMarker
+					lot.MoveTo(soldMarker, CageOffsetX(i) * ArrivalSpread, CageOffsetY(i) * ArrivalSpread, 0.0)
+				Else
+					HoldForBuyback(lot, soldFor[i])
+				EndIf
 			EndIf
 		EndIf
 		i += 1
@@ -1276,21 +1686,22 @@ Function CloseGuestAuction()
 	If soldMarker && soldEvent != "" && lastBuyer
 		SendExitEvent(soldEvent, lastBuyer, soldTotal)
 	EndIf
-	Int bought = StorageUtil.FormListCount(None, BoughtCaptivesKey)
-	If bought > 0
-		ChooseExit(ExitForFollowersBought)
-	Else
-		chosenExit = ""
-	EndIf
-	If chosenExit != "" && ExitMarker(chosenExit)
-		LeaveWithBought(bought, boughtTotal)
+	SendClosedEvent("closed", StorageUtil.FormListCount(None, BoughtCaptivesKey), StorageUtil.FormListCount(None, SoldCaptivesKey))
+	chosenExit = ""
+	If followersWon > 0 && boughtExit != "" && ExitMarker(boughtExit)
+		chosenExit = boughtExit
+		LeaveWithBought(boughtTotal)
 		Return
 	EndIf
-	i = 0
-	While i < bought
-		(StorageUtil.FormListGet(None, BoughtCaptivesKey, i) as Actor).MoveTo(player)
-		i += 1
-	EndWhile
+	If followersWon > 0
+		i = 1
+		While i < captiveCount
+			If soldTo[i] == player && !IsDelivered(i)
+				captives[i].MoveTo(player)
+			EndIf
+			i += 1
+		EndWhile
+	EndIf
 	Debug.Notification(Phrase("guestClosed", "The auction is over."))
 	If !IsInHall(player)
 		ResetHall()
@@ -1298,16 +1709,19 @@ Function CloseGuestAuction()
 EndFunction
 
 ; As when the player is sold: all in the fade, and an exit may do what it wants before it answers.
-Function LeaveWithBought(Int bought, Int total)
+Function LeaveWithBought(Int total)
 	Actor player = Game.GetPlayer()
 	ObjectReference marker = ExitMarker(chosenExit)
 	String exitEvent = JsonUtil.GetStringValue(chosenExit, "event")
 	JsonUtil.Unload(chosenExit, False)
 	FadeOut()
+	BringCompanions(marker)
 	player.MoveTo(marker)
-	Int i = 0
-	While i < bought
-		(StorageUtil.FormListGet(None, BoughtCaptivesKey, i) as Actor).MoveTo(marker, CageOffsetX(i + 1) * ArrivalSpread, CageOffsetY(i + 1) * ArrivalSpread, 0.0)
+	Int i = 1
+	While i < captiveCount
+		If soldTo[i] == player && !IsDelivered(i)
+			captives[i].MoveTo(marker, CageOffsetX(i) * ArrivalSpread, CageOffsetY(i) * ArrivalSpread, 0.0)
+		EndIf
 		i += 1
 	EndWhile
 	Utility.Wait(1.0)
@@ -1316,17 +1730,111 @@ Function LeaveWithBought(Int bought, Int total)
 	FadeIn()
 EndFunction
 
+; Followers who came into the hall with the player and were never sold. A scripted move of the player
+; leaves them behind, and the hall's navmesh does not reach the outside: without a framework that warps
+; them, they would stay there for good.
+Function BringCompanions(ObjectReference marker)
+	Actor player = Game.GetPlayer()
+	Actor[] nearby = MiscUtil.ScanCellNPCs(player, 8192.0)   ; wider than the hall
+	Int moved = 0
+	Int i = 0
+	While i < nearby.Length
+		Actor npc = nearby[i]
+		If npc && npc != player && npc.IsPlayerTeammate() && !npc.IsDead() && captives.Find(npc) < 0 && IsInHall(npc)
+			moved += 1
+			npc.MoveTo(marker, -80.0 * moved, -80.0, 0.0)
+		EndIf
+		i += 1
+	EndWhile
+EndFunction
+
 Function LeaveParty(Actor follower)
 	follower.SetPlayerTeammate(False)
 	follower.RemoveFromFaction(Game.GetForm(CurrentFollowerFactionID) as Faction)
 	follower.RemoveFromFaction(Game.GetForm(CurrentHirelingFactionID) as Faction)
 EndFunction
 
+; A follower caught without the player stays in their follower slot, waiting, so nothing warps them
+; back; only the faction goes. One who rejoins from there needs the faction back, nothing more. One who
+; was let go (below) is hired again through the follower quest, which NFF takes over as well.
 Function RejoinParty(Actor follower)
 	follower.SetActorValue(WaitingValue, 0.0)
-	follower.AddToFaction(Game.GetForm(CurrentFollowerFactionID) as Faction)
-	follower.SetPlayerTeammate(True)
+	If FollowerSlot(follower)
+		follower.AddToFaction(Game.GetForm(CurrentFollowerFactionID) as Faction)
+		follower.SetPlayerTeammate(True)
+		Return
+	EndIf
+	DialogueFollowerScript followers = Game.GetForm(DialogueFollowerID) as DialogueFollowerScript
+	If Game.GetModByName(NffPlugin) != 255
+		followers.SetFollower(follower)
+	ElseIf !followers.pFollowerAlias.GetActorReference()
+		followers.SetFollower(follower)
+	EndIf
+	; Vanilla keeps one follower: with another hired meanwhile, they stay let go, and can be hired later.
+	follower.EvaluatePackage()
 EndFunction
+
+; A follower who is no longer the player's (sold, held for the receptionist, or handed to an exit) is
+; dismissed the way their follower quest dismisses: out of the slot, so that hiring them again works,
+; and so that no slot is held by someone who will never come back. Quietly: no message, no line.
+Function LetFollowerGo(Actor follower)
+	If IsNotFollower(follower)
+		Return
+	EndIf
+	ReferenceAlias slot = FollowerSlot(follower)
+	If !slot
+		Return   ; another follower framework, or already let go
+	EndIf
+	DialogueFollowerScript followers = Game.GetForm(DialogueFollowerID) as DialogueFollowerScript
+	If Game.GetModByName(NffPlugin) != 255
+		; NFF's DismissFollower acts on its speaker alias; -1 and 0: no message, no line, done at once.
+		; It skips one in its dismissed faction without its follower faction, which LeaveParty took.
+		follower.AddToFaction(Game.GetForm(CurrentFollowerFactionID) as Faction)
+		ReferenceAlias speaker = (Game.GetFormFromFile(NffQuestID, NffPlugin) as Quest).GetAlias(NffSpeakerAlias) as ReferenceAlias
+		If speaker
+			speaker.ForceRefTo(follower)
+			followers.DismissFollower(-1, 0)   ; leaves the follower faction at rank -1, as NFF does
+			speaker.Clear()
+		Else
+			follower.RemoveFromFaction(Game.GetForm(CurrentFollowerFactionID) as Faction)
+		EndIf
+	ElseIf slot == followers.pFollowerAlias
+		; Vanilla's DismissFollower without its message and line, and without the day a hireling waits
+		; before being hired again: the player has just paid for them.
+		follower.StopCombatAlarm()
+		follower.AddToFaction(followers.pDismissedFollower)
+		follower.SetPlayerTeammate(False)
+		follower.RemoveFromFaction(followers.pCurrentHireling)
+		follower.SetActorValue(WaitingValue, 0.0)
+		slot.Clear()
+		followers.pPlayerFollowerCount.SetValue(0)
+	EndIf
+	follower.SetActorValue(WaitingValue, 0.0)   ; or hiring them again would leave them waiting
+	Debug.Trace("skyrimnet_SlaveAuction: let go " + follower.GetDisplayName() + ", in a follower slot " + (FollowerSlot(follower) != None))
+EndFunction
+
+; The follower quest's slot that holds this actor: vanilla's one, or one of NFF's.
+ReferenceAlias Function FollowerSlot(Actor follower)
+	Quest followers = Game.GetForm(DialogueFollowerID) as Quest
+	Int count = followers.GetNumAliases()
+	Int i = 0
+	While i < count
+		ReferenceAlias slot = followers.GetNthAlias(i) as ReferenceAlias
+		If slot && slot.GetActorReference() == follower
+			Return slot
+		EndIf
+		i += 1
+	EndWhile
+	Return None
+EndFunction
+
+; For exit mods: give a follower back to the player, whether they were let go or are still in their slot.
+Event OnReturnFollower(Form follower)
+	Actor returned = follower as Actor
+	If returned && !returned.IsDead()
+		RejoinParty(returned)
+	EndIf
+EndEvent
 
 Function HoldForBuyback(Actor follower, Int price)
 	ActorUtil.AddPackageOverride(follower, Game.GetFormFromFile(DoNothingID, "Skyrim.esm") as Package, 100)
@@ -1334,7 +1842,22 @@ Function HoldForBuyback(Actor follower, Int price)
 	follower.EvaluatePackage()
 	StorageUtil.FormListAdd(None, BuybackListKey, follower)
 	StorageUtil.IntListAdd(None, BuybackPriceKey, (price * BuybackMarkupPercent) / 100)
+	If lotsExit != ""
+		StorageUtil.SetStringValue(follower, LotExitKey, lotsExit)
+	Else
+		StorageUtil.UnsetStringValue(follower, LotExitKey)
+	EndIf
 	UpdateBuybackCount()
+EndFunction
+
+Function RemoveFromBuyback(Actor lot)
+	Int held = StorageUtil.FormListFind(None, BuybackListKey, lot)
+	If held >= 0
+		StorageUtil.FormListRemoveAt(None, BuybackListKey, held)
+		StorageUtil.IntListRemoveAt(None, BuybackPriceKey, held)
+		StorageUtil.UnsetStringValue(lot, LotExitKey)
+		UpdateBuybackCount()
+	EndIf
 EndFunction
 
 Function UpdateBuybackCount()
@@ -1365,14 +1888,66 @@ Function BuyBack()
 		Return
 	EndIf
 	player.RemoveItem(gold, price, True)
-	Actor follower = StorageUtil.FormListGet(None, BuybackListKey, pick) as Actor
+	Actor lot = StorageUtil.FormListGet(None, BuybackListKey, pick) as Actor
+	String lotExit = StorageUtil.GetStringValue(lot, LotExitKey)
 	StorageUtil.FormListRemoveAt(None, BuybackListKey, pick)
 	StorageUtil.IntListRemoveAt(None, BuybackPriceKey, pick)
+	StorageUtil.UnsetStringValue(lot, LotExitKey)
 	UpdateBuybackCount()
-	ActorUtil.RemovePackageOverride(follower, Game.GetFormFromFile(DoNothingID, "Skyrim.esm") as Package)
-	RejoinParty(follower)
-	follower.MoveTo(player)
-	follower.EvaluatePackage()
+	ActorUtil.RemovePackageOverride(lot, Game.GetFormFromFile(DoNothingID, "Skyrim.esm") as Package)
+	; The exit the auction was asked for, as if they had been won there. If that mod has gone, as if none
+	; was asked for: the money has been paid.
+	If IsUsableLotExit(lotExit)
+		ObjectReference marker = ExitMarker(lotExit)
+		String lotEvent = JsonUtil.GetStringValue(lotExit, "event")
+		JsonUtil.Unload(lotExit, False)
+		LetFollowerGo(lot)   ; let go when held; this is for those held in a save from before that
+		lot.MoveTo(marker)
+		lot.EvaluatePackage()
+		Debug.Notification(Phrase("lotSentOn", "Sent on ahead") + ": " + lot.GetDisplayName())
+		SendLotEvent(lotEvent, lot, price, True)
+		Return
+	EndIf
+	If !IsNotFollower(lot)
+		RejoinParty(lot)
+	EndIf
+	lot.MoveTo(player)
+	lot.EvaluatePackage()
+	If IsNotFollower(lot)
+		LetGo(lot)
+	EndIf
+EndFunction
+
+; The hall's navmesh does not reach the outside, and its door locks behind the player: whoever is let go
+; here cannot walk home. They go when the player leaves, out of sight.
+Function LetGo(Actor lot)
+	StorageUtil.FormListAdd(None, GoHomeKey, lot, False)
+EndFunction
+
+Function SendThemHome()
+	Int count = StorageUtil.FormListCount(None, GoHomeKey)
+	If count == 0
+		Return
+	EndIf
+	Cell hall = Ref(CageMarkerID).GetParentCell()
+	Int i = 0
+	While i < count
+		Actor lot = StorageUtil.FormListGet(None, GoHomeKey, i) as Actor
+		If lot && !lot.IsDead()
+			lot.EvaluatePackage()
+			lot.MoveToPackageLocation()
+			If !hall || lot.GetParentCell() == hall   ; a package that stays where they stand
+				lot.MoveToMyEditorLocation()
+			EndIf
+			If hall && lot.GetParentCell() == hall   ; placed at run time, with no place of their own
+				lot.MoveTo(Ref(OutsideMarkerID))
+			EndIf
+			lot.EvaluatePackage()
+			Debug.Trace("SlaveAuction: sent home " + lot.GetDisplayName() + ", still in the hall " + (hall && lot.GetParentCell() == hall))
+		EndIf
+		i += 1
+	EndWhile
+	StorageUtil.FormListClear(None, GoHomeKey)
 EndFunction
 
 ; The player never came: the followers are sold without them. Not while they are in the hall.
@@ -1385,8 +1960,13 @@ Event OnUpdateGameTime()
 		Return
 	EndIf
 	busy = True
+	DecideExit()
 	SellTheRest()
-	Debug.Notification(Phrase("soldOffScreen", "You came too late: your followers have been sold."))
+	If lotsNamed
+		Debug.Notification(Phrase("lotsTooLate", "You came too late: the captives have been sold."))
+	Else
+		Debug.Notification(Phrase("soldOffScreen", "You came too late: your followers have been sold."))
+	EndIf
 	CloseGuestAuction()
 	busy = False
 EndEvent
@@ -1409,11 +1989,18 @@ Function GuestBrawl()
 	EndIf
 	Int i = 1
 	While i < captiveCount
-		ReleaseFollower(i)
-		RejoinParty(captives[i])
-		captives[i].MoveTo(player, 60.0 * i, 0.0, 0.0)
+		If !IsDelivered(i)   ; those already sent on stay sold
+			ReleaseFollower(i)
+			If IsNotFollower(captives[i])
+				LetGo(captives[i])
+			Else
+				RejoinParty(captives[i])
+			EndIf
+			captives[i].MoveTo(player, 60.0 * i, 0.0, 0.0)
+		EndIf
 		i += 1
 	EndWhile
+	SendClosedEvent("aborted", 0, 0)
 	i = 0
 	While i < BuyerCount
 		Actor buyer = Ref(BuyerID + i) as Actor
@@ -1437,6 +2024,17 @@ EndFunction
 ; One exit of a kind, fixed in the MCM or by weight; none leaves it to the liberators or the holding room.
 ; Weight is the odds: each usable exit replaces the one held so far with the chance of its share of
 ; the total. A fixed exit that has gone falls back on the others, by weight.
+Function DecideExit()
+	If !exitPending
+		Return
+	EndIf
+	exitPending = False
+	ChooseExit(ExitForFollowersSold)
+	If chosenExit != ""   ; the seat already holds Lady Livia
+		SetUpTwelfthSeat()
+	EndIf
+EndFunction
+
 Function ChooseExit(String kind)
 	chosenExit = ""
 	String fixedId = ""
@@ -1449,11 +2047,12 @@ Function ChooseExit(String kind)
 	Int i = 0
 	While i < files.Length && i < MaxExits && !fixedFound
 		String file = ExitPath(files[i])
-		String problem = ExitProblem(file)
-		If problem != ""
-			Debug.Trace("skyrimnet_SlaveAuction: exit " + file + " left out: " + problem)
-		ElseIf !IsExitOff(file) && ExitKind(file) == kind
-			If fixedId != "" && JsonUtil.GetStringValue(file, "id") == fixedId
+		; The cheap checks first: the first lot waits for this behind a black screen.
+		If !IsExitOff(file) && ExitKind(file) == kind
+			String problem = ExitProblem(file)
+			If problem != ""
+				Debug.Trace("skyrimnet_SlaveAuction: exit " + file + " left out: " + problem)
+			ElseIf fixedId != "" && JsonUtil.GetStringValue(file, "id") == fixedId
 				chosenExit = file
 				fixedFound = True
 			Else
@@ -1511,6 +2110,34 @@ String Function ExitKind(String file)
 	Return JsonUtil.GetStringValue(file, "for", ExitForPlayerSold)
 EndFunction
 
+; The file of the lots_bought exit with this id, or "" when there is none to use.
+String Function FindLotExit(String id)
+	If id == ""
+		Return ""
+	EndIf
+	String[] files = ExitFiles()
+	Int i = 0
+	While i < files.Length && i < MaxExits
+		String file = ExitPath(files[i])
+		If IsUsableLotExit(file) && JsonUtil.GetStringValue(file, "id") == id
+			JsonUtil.Unload(file, False)
+			Return file
+		EndIf
+		JsonUtil.Unload(file, False)
+		i += 1
+	EndWhile
+	Debug.Trace("skyrimnet_SlaveAuction: no lots_bought exit with the id " + id)
+	Return ""
+EndFunction
+
+; The file stays loaded: the caller reads it and unloads it.
+Bool Function IsUsableLotExit(String file)
+	If file == ""
+		Return False
+	EndIf
+	Return ExitProblem(file) == "" && ExitKind(file) == ExitForLotsBought && !IsExitOff(file)
+EndFunction
+
 String[] Function ExitFiles()
 	Return MiscUtil.FilesInFolder(ExitsFolder, ".json")
 EndFunction
@@ -1529,7 +2156,7 @@ String Function ExitProblem(String file)
 		Return "unsupported api_version " + version
 	EndIf
 	String kind = ExitKind(file)
-	If kind != ExitForPlayerSold && kind != ExitForFollowersSold && kind != ExitForFollowersBought
+	If kind != ExitForPlayerSold && kind != ExitForFollowersSold && kind != ExitForFollowersBought && kind != ExitForLotsBought
 		Return "unknown for: " + kind
 	EndIf
 	If JsonUtil.GetStringValue(file, "id") == ""
@@ -1538,10 +2165,54 @@ String Function ExitProblem(String file)
 	If JsonUtil.GetStringValue(file, "name") == ""
 		Return "no name"
 	EndIf
+	String missing = MissingPlugins(JsonUtil.GetStringValue(file, "plugin"))
+	If missing != ""
+		Return "plugin not loaded: " + missing
+	EndIf
+	missing = MissingPlugins(JsonUtil.GetStringValue(file, "requires"))
+	If missing != ""
+		Return "needs " + missing
+	EndIf
 	If !ExitMarker(file)
 		Return "no marker " + JsonUtil.GetStringValue(file, "marker") + " in " + JsonUtil.GetStringValue(file, "plugin")
 	EndIf
 	Return ""
+EndFunction
+
+; The plugins of a comma-separated list that are not loaded, or "" when all are.
+String Function MissingPlugins(String list)
+	If list == ""
+		Return ""
+	EndIf
+	String missing = ""
+	String[] names = StringUtil.Split(list, ",")
+	Int i = 0
+	While i < names.Length
+		String name = Trimmed(names[i])
+		If name != "" && Game.GetModByName(name) == 255 && Game.GetLightModByName(name) == 65535
+			If missing != ""
+				missing += ", "
+			EndIf
+			missing += name
+		EndIf
+		i += 1
+	EndWhile
+	Return missing
+EndFunction
+
+String Function Trimmed(String text)
+	Int first = 0
+	Int last = StringUtil.GetLength(text) - 1
+	While first <= last && StringUtil.GetNthChar(text, first) == " "
+		first += 1
+	EndWhile
+	While last >= first && StringUtil.GetNthChar(text, last) == " "
+		last -= 1
+	EndWhile
+	If first > last
+		Return ""
+	EndIf
+	Return StringUtil.Substring(text, first, last - first + 1)
 EndFunction
 
 Bool Function IsExitOff(String file)
@@ -1568,6 +2239,10 @@ Function SetExitWeight(String file, Int weight)
 EndFunction
 
 ObjectReference Function ExitMarker(String file)
+	; Asked of a plugin that is not loaded, GetFormFromFile writes an error to the log.
+	If MissingPlugins(JsonUtil.GetStringValue(file, "plugin")) != ""
+		Return None
+	EndIf
 	Return Game.GetFormFromFile(HexToInt(JsonUtil.GetStringValue(file, "marker")), JsonUtil.GetStringValue(file, "plugin")) as ObjectReference
 EndFunction
 
@@ -1627,6 +2302,50 @@ Function SendExitEvent(String exitEvent, Actor buyer, Int price)
 		ModEvent.PushForm(handle, buyer)
 		ModEvent.PushInt(handle, price)
 		ModEvent.PushString(handle, captureReason)
+		ModEvent.Send(handle)
+	EndIf
+EndFunction
+
+; One for each lot a lots_bought exit receives, at the close or when bought back later.
+; Event OnLot(Form lot, Int price, Bool boughtBack)
+Function SendLotEvent(String lotEvent, Actor lot, Int price, Bool boughtBack)
+	If lotEvent == ""
+		Return
+	EndIf
+	Int handle = ModEvent.Create(lotEvent)
+	If handle
+		ModEvent.PushForm(handle, lot)
+		ModEvent.PushInt(handle, price)
+		ModEvent.PushBool(handle, boughtBack)
+		ModEvent.Send(handle)
+	EndIf
+EndFunction
+
+; One for each lot another buyer wins, for a followers_sold exit with each_lot.
+; Event OnLotSold(Form lot, Form buyer, Int price)
+Function SendEachLotEvent(String lotEvent, Actor lot, Actor buyer, Int price)
+	If lotEvent == ""
+		Return
+	EndIf
+	Int handle = ModEvent.Create(lotEvent)
+	If handle
+		ModEvent.PushForm(handle, lot)
+		ModEvent.PushForm(handle, buyer)
+		ModEvent.PushInt(handle, price)
+		ModEvent.Send(handle)
+	EndIf
+EndFunction
+
+; An auction without the player is over, whoever won what: the only word a requester gets when nobody
+; was won. Event OnAuctionClosed(Form requester, String result, Int bought, Int lost), result "closed"
+; or "aborted" (a fight in the hall). The requester is None for the receptionist's.
+Function SendClosedEvent(String result, Int bought, Int lost)
+	Int handle = ModEvent.Create("skyrimnet_SlaveAuction_Closed")
+	If handle
+		ModEvent.PushForm(handle, auctionRequester)
+		ModEvent.PushString(handle, result)
+		ModEvent.PushInt(handle, bought)
+		ModEvent.PushInt(handle, lost)
 		ModEvent.Send(handle)
 	EndIf
 EndFunction
@@ -1695,6 +2414,7 @@ Function EndAuction()
 	SkyrimNetApi.DirectNarration("Masked liberators burst in through the locked door from the reception room and fall upon " + playerBuyer.GetDisplayName() \
 		+ ", the slaver who has just bought " + player.GetDisplayName() + " and was leading " + Possessive(player) + " new property out.", liberators[0], playerBuyer)
 	playerBuyer.SetDontMove(False)
+	liberating = True
 	i = 0
 	While i < liberators.Length
 		liberators[i].StartCombat(playerBuyer)
@@ -1733,6 +2453,7 @@ Function PanicBuyers(Actor[] liberators)
 EndFunction
 
 Function FreeCaptives()
+	liberating = False
 	ReleaseCaptives()
 	ObjectReference chest = Ref(PlayerChestID)
 	chest.Lock(False)
@@ -1771,7 +2492,7 @@ EndFunction
 Function ReleaseFollower(Int i)
 	Actor follower = captives[i]
 	UnbindArms(follower)
-	ChestFor(i).RemoveAllItems(follower, False, True)
+	MoveItems(ChestFor(i), follower)
 	If savedOutfits[i]
 		follower.SetOutfit(savedOutfits[i])
 	EndIf
@@ -1782,6 +2503,7 @@ EndFunction
 
 ; The door's cell has been left, by the door or any other way (coc, a teleport).
 Function HallLeft()
+	SendThemHome()
 	If !busy && AuctionState() == StateFreed
 		ResetHall()
 	EndIf
@@ -1814,11 +2536,14 @@ Function ResetHall()
 		buyer.EvaluatePackage()
 		i += 1
 	EndWhile
-	If restraint
+	If CrossIsOurs()
+		Debug.Trace("skyrimnet_SlaveAuction: removing the cross " + restraint)
 		restraint.Disable()
 		restraint.Delete()
-		restraint = None
+	ElseIf restraint
+		Debug.Trace("skyrimnet_SlaveAuction: the cross " + restraint + " was already gone")
 	EndIf
+	restraint = None
 	Ref(HallDoorID).SetOpen(False)
 	Ref(HallDoorID).Lock(True)
 	Ref(HallDoorID).SetLockLevel(255)

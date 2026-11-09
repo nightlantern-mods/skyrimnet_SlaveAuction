@@ -1,0 +1,10 @@
+MutagenObjectType: PlacedObject
+FormKey: 000801:skyrimnet_SlaveAuction_ExitDebt.esp
+MajorRecordFlagsRaw: 1024
+EditorID: skyrimnet_SlaveAuction_ExitDebtArrival
+SkyrimMajorRecordFlags:
+- 0x400
+Base: 000034:Skyrim.esm
+Placement:
+  Position: 171203.71, -84975.07, 10098.78
+  Rotation: 0, 0, 0.9054768

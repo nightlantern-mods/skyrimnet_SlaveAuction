@@ -1,0 +1,5 @@
+ModKey: IOULedger.esp
+GameRelease: SkyrimSE
+ModHeader:
+  Flags:
+  - Small

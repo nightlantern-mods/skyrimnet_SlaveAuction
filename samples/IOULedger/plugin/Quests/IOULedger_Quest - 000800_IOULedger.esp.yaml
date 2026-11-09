@@ -1,0 +1,122 @@
+FormKey: 000800:IOULedger.esp
+EditorID: IOULedger_Quest
+VirtualMachineAdapter:
+  Scripts:
+  - Name: IOULedger
+  FileName: ''
+  Aliases:
+  - Property:
+      Name: ''
+      Object: 000800:IOULedger.esp
+      Alias: 0
+    Scripts:
+    - Name: IOULedger_Load
+Name:
+  TargetLanguage: English
+  Value: IOU Ledger
+Flags:
+- StartGameEnabled
+Priority: 50
+Type: Misc
+Objectives:
+- Index: 0
+  DisplayText:
+    TargetLanguage: English
+    Value: Track the people in debt
+  Targets:
+  - AliasID: 1
+  - AliasID: 2
+  - AliasID: 3
+  - AliasID: 4
+  - AliasID: 5
+  - AliasID: 6
+  - AliasID: 7
+  - AliasID: 8
+  - AliasID: 9
+  - AliasID: 10
+NextAliasID: 11
+Aliases:
+- Name: Player
+  Flags: []
+  ForcedReference: 000014:Skyrim.esm
+  VoiceTypes: Null
+- ID: 1
+  Name: Debtor0
+  Flags:
+  - Optional
+  - AllowReuseInQuest
+  - AllowDisabled
+  - AllowDead
+  VoiceTypes: Null
+- ID: 2
+  Name: Debtor1
+  Flags:
+  - Optional
+  - AllowReuseInQuest
+  - AllowDisabled
+  - AllowDead
+  VoiceTypes: Null
+- ID: 3
+  Name: Debtor2
+  Flags:
+  - Optional
+  - AllowReuseInQuest
+  - AllowDisabled
+  - AllowDead
+  VoiceTypes: Null
+- ID: 4
+  Name: Debtor3
+  Flags:
+  - Optional
+  - AllowReuseInQuest
+  - AllowDisabled
+  - AllowDead
+  VoiceTypes: Null
+- ID: 5
+  Name: Debtor4
+  Flags:
+  - Optional
+  - AllowReuseInQuest
+  - AllowDisabled
+  - AllowDead
+  VoiceTypes: Null
+- ID: 6
+  Name: Debtor5
+  Flags:
+  - Optional
+  - AllowReuseInQuest
+  - AllowDisabled
+  - AllowDead
+  VoiceTypes: Null
+- ID: 7
+  Name: Debtor6
+  Flags:
+  - Optional
+  - AllowReuseInQuest
+  - AllowDisabled
+  - AllowDead
+  VoiceTypes: Null
+- ID: 8
+  Name: Debtor7
+  Flags:
+  - Optional
+  - AllowReuseInQuest
+  - AllowDisabled
+  - AllowDead
+  VoiceTypes: Null
+- ID: 9
+  Name: Debtor8
+  Flags:
+  - Optional
+  - AllowReuseInQuest
+  - AllowDisabled
+  - AllowDead
+  VoiceTypes: Null
+- ID: 10
+  Name: Debtor9
+  Flags:
+  - Optional
+  - AllowReuseInQuest
+  - AllowDisabled
+  - AllowDead
+  VoiceTypes: Null

@@ -1,0 +1,4 @@
+form: "IOULedger.esp|0x802"
+originalName: "[IOU] Debt Bond"
+customName: Debt bond
+customDescription: A signed bond. Whoever carries it owes a debt that is not paid off yet.

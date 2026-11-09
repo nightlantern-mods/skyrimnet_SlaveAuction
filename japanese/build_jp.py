@@ -23,6 +23,8 @@ DEFAULT_OUT = os.path.join(HERE, "build")
 
 # Text a player sees: names (FULL) and dialogue lines (NAM1).
 TEXT_SUBRECORDS = {b"FULL", b"NAM1", b"RNAM"}
+# And some only in one record type: a quest's objectives (NNAM), a book's text (DESC).
+RECORD_TEXT_SUBRECORDS = {b"QUST": {b"NNAM"}, b"BOOK": {b"DESC"}}
 
 
 def walk(buf, pos, end, out, mapping, used):
@@ -65,7 +67,7 @@ def patch_subrecords(record_type, data, mapping, used):
             p += whole
             continue
         body = data[p + 6:p + 6 + sub_size]
-        if sub in TEXT_SUBRECORDS and record_type != b"TES4":
+        if (sub in TEXT_SUBRECORDS or sub in RECORD_TEXT_SUBRECORDS.get(bytes(record_type), ())) and record_type != b"TES4":
             text = body.rstrip(b"\0").decode("utf-8", "replace")
             if text in mapping:
                 body = mapping[text].encode("utf-8") + b"\0"
@@ -120,6 +122,8 @@ def main():
             shutil.copyfile(os.path.join(HERE, "translations", name),
                             os.path.join(translations_dir, f"{stem}_{language}.txt"))
     translate_sample(out_dir, "skyrimnet_SlaveAuction_ExitMine", "ja_map_mine.json")
+    translate_sample(out_dir, "skyrimnet_SlaveAuction_EntrySack", "ja_map_sack.json")
+    translate_sample(out_dir, "IOULedger", "ja_map_ledger.json")
     # The samples' other text, for whoever installs them.
     shutil.copytree(os.path.join(HERE, "samples"), out_dir, dirs_exist_ok=True)
     print(f"{len(used)} texts in Japanese, {len(out)} bytes, written to {out_dir}")

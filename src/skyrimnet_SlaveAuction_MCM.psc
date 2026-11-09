@@ -86,18 +86,21 @@ Function PrepareOnce()
 	If !exitsRead
 		exitsRead = True
 		auction = Game.GetFormFromFile(0x801, "skyrimnet_SlaveAuction.esp") as skyrimnet_SlaveAuction
-		kinds = new String[3]
+		; The last kind is listed but never chosen here: only a request can name its exits.
+		kinds = new String[4]
 		kinds[0] = auction.ExitForPlayerSold
 		kinds[1] = auction.ExitForFollowersSold
 		kinds[2] = auction.ExitForFollowersBought
+		kinds[3] = auction.ExitForLotsBought
 		kindHeaders = new String[3]
 		kindHeaders[0] = "$SA_KindPlayerSold"
 		kindHeaders[1] = "$SA_KindFollowersSold"
 		kindHeaders[2] = "$SA_KindFollowersBought"
-		kindInfos = new String[3]
+		kindInfos = new String[4]
 		kindInfos[0] = "$SA_InfoPlayerSold"
 		kindInfos[1] = "$SA_InfoFollowersSold"
 		kindInfos[2] = "$SA_InfoFollowersBought"
+		kindInfos[3] = "$SA_InfoLotsBought"
 		oMode = Utility.CreateIntArray(KindCount, -1)
 		oFixed = Utility.CreateIntArray(KindCount, -1)
 		oExitOn = Utility.CreateIntArray(RowsPerPage, -1)
@@ -199,7 +202,11 @@ Function ResetExitsPage()
 	Int i = listPage * RowsPerPage
 	While i < exitCount && row < RowsPerPage
 		oExitOn[row] = AddToggleOption(exitNames[i], !auction.IsExitOff(exitFiles[i]))
-		oExitWeight[row] = AddSliderOption("$SA_Weight", auction.ExitWeight(exitFiles[i]))
+		If exitKinds[i] < KindCount
+			oExitWeight[row] = AddSliderOption("$SA_Weight", auction.ExitWeight(exitFiles[i]))
+		Else
+			AddEmptyOption()   ; no odds: only a request can name it
+		EndIf
 		row += 1
 		i += 1
 	EndWhile

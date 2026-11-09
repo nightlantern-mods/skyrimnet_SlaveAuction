@@ -1,0 +1,9 @@
+FormKey: 000803:skyrimnet_SlaveAuction_EntrySack.esp
+EditorID: skyrimnet_SlaveAuction_EntrySackTopic
+Name:
+  TargetLanguage: English
+  Value: "(Hand over the people you have tied up)"
+Priority: 50
+Quest: 000800:skyrimnet_SlaveAuction_EntrySack.esp
+SubtypeName: CUST
+Branch: 000802:skyrimnet_SlaveAuction_EntrySack.esp

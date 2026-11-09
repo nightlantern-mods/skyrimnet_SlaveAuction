@@ -1,0 +1,40 @@
+FormKey: 000804:skyrimnet_SlaveAuction_EntrySack.esp
+PreviousDialog: Null
+VirtualMachineAdapter:
+  Scripts:
+  - Name: skyrimnet_SlaveAuction_EntrySackTIF
+  ScriptFragments:
+    MutagenObjectType: ScriptFragments
+    FileName: skyrimnet_SlaveAuction_EntrySackTIF
+    OnEnd:
+      ExtraBindDataVersion: 1
+      ScriptName: skyrimnet_SlaveAuction_EntrySackTIF
+      FragmentName: Fragment_0
+Flags:
+  Flags:
+  - Goodbye
+FavorLevel: None
+Responses:
+- EmotionValue: 50
+  ResponseNumber: 1
+  Unknown2: 0x000000
+  Unknown3: 0x000000
+  Text:
+    TargetLanguage: English
+    Value: '...'
+  ScriptNotes: ''
+  Edits: ''
+Conditions:
+- MutagenObjectType: ConditionFloat
+  Unknown1: 0x000000
+  Data:
+    MutagenObjectType: GetIsAliasRefConditionData
+    ReferenceAliasIndex: 1
+  ComparisonValue: 1
+- MutagenObjectType: ConditionFloat
+  CompareOperator: GreaterThan
+  Unknown1: 0x000000
+  Data:
+    MutagenObjectType: GetGlobalValueConditionData
+    Global: 000801:skyrimnet_SlaveAuction_EntrySack.esp
+  ComparisonValue: 0
