@@ -1,4 +1,4 @@
-# SkyrimNet Slave Auction 0.2.0
+# SkyrimNet Slave Auction 0.2.1
 
 A secret slave auction in a stone basement near Riften. Get sold on its stage, or sit among the
 buyers and bid on whoever is in the cage: your own followers, or anyone another mod brings in.

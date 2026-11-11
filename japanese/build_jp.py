@@ -118,7 +118,7 @@ def main():
     # One file per plugin: the main one, and the samples' for whoever installs them.
     for name in os.listdir(os.path.join(HERE, "translations")):
         stem = name[:-len("_JAPANESE.txt")]
-        for language in ("JAPANESE", "ENGLISH"):
+        for language in ("CHINESE", "CZECH", "ENGLISH", "FRENCH", "GERMAN", "ITALIAN", "JAPANESE", "POLISH", "RUSSIAN", "SPANISH"):
             shutil.copyfile(os.path.join(HERE, "translations", name),
                             os.path.join(translations_dir, f"{stem}_{language}.txt"))
     translate_sample(out_dir, "skyrimnet_SlaveAuction_ExitMine", "ja_map_mine.json")

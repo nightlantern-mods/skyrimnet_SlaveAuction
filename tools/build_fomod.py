@@ -106,18 +106,28 @@ def add_project(prefix, project):
         for name in names:
             path = os.path.join(folder, name)
             rel = os.path.relpath(path, assets).replace(os.sep, "/")
-            files[f"{prefix}/{rel}"] = open(path, "rb").read()
+            data = open(path, "rb").read()
+            files[f"{prefix}/{rel}"] = data
+            # SkyUI reads <mod>_<the game's language>.txt: the English text goes under every language's name,
+            # so that no game shows the $keys. A translation replaces its own language's file.
+            if rel.startswith("Interface/Translations/") and rel.endswith("_ENGLISH.txt"):
+                for language in GAME_LANGUAGES:
+                    files[f"{prefix}/{rel[:-len('ENGLISH.txt')]}{language}.txt"] = data
+
+
+GAME_LANGUAGES = ("CHINESE", "CZECH", "ENGLISH", "FRENCH", "GERMAN", "ITALIAN", "JAPANESE", "POLISH", "RUSSIAN", "SPANISH")
 
 
 def japanese_overlay(prefix, project, map_file):
-    """Everything with text, replaced under the same name. The translations go under both language names,
+    """Everything with text, replaced under the same name. The translations go under every language's name,
     so that they show whichever language the game runs in."""
     if map_file:
         files[f"{prefix}/{project}.esp"] = build_jp.translated_plugin(os.path.join(project_folder(project), "build", project + ".esp"), map_file)
     translation = os.path.join(JAPANESE, "translations", project + "_JAPANESE.txt")
     if os.path.exists(translation):
         data = open(translation, "rb").read()
-        for language in ("ENGLISH", "JAPANESE"):
+        # The language chosen in the installer, whatever the game's.
+        for language in GAME_LANGUAGES:
             files[f"{prefix}/Interface/Translations/{project}_{language}.txt"] = data
     samples = os.path.join(JAPANESE, "samples")
     for folder, _, names in os.walk(samples):
